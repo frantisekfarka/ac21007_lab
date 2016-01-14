@@ -8,8 +8,8 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
         open *lab01* directory:
 
         ```
-        git clone https://github.com/frantisekfarka/ac21007_lab.git
-        cd ac21007_lab/lab01
+        $ git clone https://github.com/frantisekfarka/ac21007_lab.git
+        $ cd ac21007_lab/lab01
         ```
 
     2. If you are not familiar with version control system *git* and want to
@@ -23,15 +23,15 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
    2. Compile it in the terminal with:
 
         ```
-            $ ghc -o main Main.hs
+        $ ghc -o main Main.hs
         ```
    3. You can then run the executable from the terminal (./hello on Unix
       systems, hello.exe on
       Windows):
 
         ```
-            $ ./hello
-            Hello, World!
+        $ ./hello
+        Hello, World!
         ```
 
 3. Use Haskell interpreter (GHCi) to test the file *Main.hs*. Haskell
@@ -41,22 +41,22 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
    1. Load the file *Main.hs* to GHCi:
 
         ```
-            $ ghci Main.hs
-            GHCi, version 7.10.2: http://www.haskell.org/ghc/  :? for help
-            [1 of 1] Compiling Main             ( Main.hs, interpreted )
-            Ok, modules loaded: Main.
-            *Main> 
+        $ ghci Main.hs
+        GHCi, version 7.10.2: http://www.haskell.org/ghc/  :? for help
+        [1 of 1] Compiling Main             ( Main.hs, interpreted )
+        Ok, modules loaded: Main.
+        *Main> 
         ```
 
         or alternatively run plain GHCi shell and use a command `:load <module>` to
         load it:
 
         ```
-            $ ghci
-            GHCi, version 7.10.2: http://www.haskell.org/ghc/  :? for help
-            Prelude> :load Main.hs
-            [1 of 1] Compiling Main             ( Main.hs, interpreted )
-            Ok, modules loaded: Main.
+        $ ghci
+        GHCi, version 7.10.2: http://www.haskell.org/ghc/  :? for help
+        Prelude> :load Main.hs
+        [1 of 1] Compiling Main             ( Main.hs, interpreted )
+        Ok, modules loaded: Main.
         ```
 
         Note that tab-completion should work within GHCi shell.
@@ -64,17 +64,17 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
     2. When in GHCi, verify the type of function `hello` using a command:
 
         ```
-            *Main> :type hello
-            hello :: String -> String
+        *Main> :type hello
+        hello :: String -> String
         ```
 
         or alternatively get more information using a command `:into <function>`
 
-    3. Run the function `hello` from GHCi with some atgument, e.g.
+    3. Run the function `hello` from GHCi with some argument, e.g.
 
         ```
-            *Main> hello "Franta"
-            "Hello Franta!"
+        *Main> hello "Franta"
+        "Hello Franta!"
         ```
 
     4. Edit the file *Main.hs* such that functin `hello` outputs the text
@@ -83,15 +83,15 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
        `:reload`:
 
        ```
-            *Main> :reload 
-            Ok, modules loaded: Main.
+       *Main> :reload 
+       Ok, modules loaded: Main.
        ```
 
     5. Test the new behavior of function `hello`:
 
         ```
-            *Main> hello "Franta"
-            "Goodbye Franta!"
+        *Main> hello "Franta"
+        "Goodbye Franta!"
         ```
 
     6. Exit the GHCi shell by a command `:quit`
@@ -99,5 +99,49 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
     7. Recompile your *Main.hs* and test the new binary!
 
 
+
+4. Now try to do the same using Cabal.
+
+    1. The source files for this lab are provided as a Haskell package.
+        There is a package description in the file *lab01.cabal* However, you do
+        not need to concern yourself with contents of this file
+
+    2. Initialize new development environment (sandbox) for a package and
+       configure the package (in this order):
+
+       ```
+       $ cabal sandbox init
+       $ cabal configure
+       ```
+    3. Now the environment is prepared and you can instruct cabal to biuld and
+       run the executable for you:
+
+       ```
+       $ cabal run
+       ```
+
+       you can also ask cabal to run GHCi while loading the main file:
+
+
+       $ cabal repl
+    
+       (note: repl stands for "read--eval--print loop", which is what GHCi does)
+
+
+    4. Bonus: You can try to generate documentation for this package:
+
+       ```
+       $ cabal haddock --executables
+       ```
+
+       The generated documentation is stored in *dist/doc/html/lab01/lab01/index.html*
+
+
+5. Implement your own boolean functions `myAnd`, `myOr`, `myImply`, and `myXor`.
+   Behavior of these function is described in comments in the file *Main.hs*
+   For each function uncomment the type signature and provide an implementation.
+
+6. Define a function that converts boolean value to its textual description. Yet
+   again the specification and type signature is in comments in *Main.hs*
 
 
