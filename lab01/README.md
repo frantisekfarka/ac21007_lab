@@ -36,7 +36,7 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
 
 3. Use Haskell interpreter (GHCi) to test the file *Main.hs*. Haskell
    interpreter reads expressions from command line and evaluates it. The
-   beaviour of interpterter is controlled by command prefixed with ":"
+   behaviour of interpreter is controlled by command prefixed with ":"
 
    1. Load the file *Main.hs* to GHCi:
 
@@ -77,7 +77,7 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
         "Hello Franta!"
         ```
 
-    4. Edit the file *Main.hs* such that functin `hello` outputs the text
+    4. Edit the file *Main.hs* such that function `hello` outputs the text
        "Goodbye" while keeping the original GHCi shell open. Then go to the
        shell and reload the file from within the shell using the command
        `:reload`:
@@ -87,7 +87,7 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
        Ok, modules loaded: Main.
        ```
 
-    5. Test the new behavior of function `hello`:
+    5. Test the new behaviour of function `hello`:
 
         ```
         *Main> hello "Franta"
@@ -106,14 +106,14 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
         There is a package description in the file *lab01.cabal* However, you do
         not need to concern yourself with contents of this file
 
-    2. Initialize new development environment (sandbox) for a package and
+    2. Initialise new development environment (sandbox) for a package and
        configure the package (in this order):
 
        ```
        $ cabal sandbox init
        $ cabal configure
        ```
-    3. Now the environment is prepared and you can instruct cabal to biuld and
+    3. Now the environment is prepared and you can instruct cabal to build and
        run the executable for you:
 
        ```
@@ -138,8 +138,8 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
 
 
 5. Implement your own boolean functions `myAnd`, `myOr`, `myImply`, and `myXor`.
-   Behavior of these function is described in comments in the file *Main.hs*
-   For each function uncomment the type signature and provide an implementation.
+   Behaviour of these function is described in comments in the file *Main.hs*
+   For each function uncommon the type signature and provide an implementation.
 
 6. Define a function that converts boolean value to its textual description. Yet
    again the specification and type signature is in comments in *Main.hs*
