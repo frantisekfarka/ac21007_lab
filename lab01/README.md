@@ -122,8 +122,9 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
 
        you can also ask cabal to run GHCi while loading the main file:
 
-
+       ```
        $ cabal repl
+       ```
     
        (note: repl stands for "read--eval--print loop", which is what GHCi does)
 
