@@ -139,9 +139,7 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
 
 5. Implement your own boolean functions `myAnd`, `myOr`, `myImply`, and `myXor`.
    Behaviour of these function is described in comments in the file *Main.hs*
-   For each function uncommon the type signature and provide an implementation.
+   For each function uncomment the type signature and provide an implementation.
 
 6. Define a function that converts boolean value to its textual description. Yet
    again the specification and type signature is in comments in *Main.hs*
-
-
