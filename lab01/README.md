@@ -67,7 +67,7 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
         hello :: String -> String
         ```
 
-        or alternatively get more information using a command `:into <function>`
+        or alternatively get more information using a command `:info <function>`
 
     3. Run the function `hello` from GHCi with some argument, e.g.
 
