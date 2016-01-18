@@ -2,7 +2,7 @@ Lab 1: Haskell Programming, 9.00-10.00
 ======================================
 
 Please either use a Linux machine in the Lab 2 to do this exercise or install
-Haskell Platform to your own machine. Installation packages are available for
+Haskell Platform on your own machine. Installation packages are available for
 Linux, Mac, and Windows:
 
 ```
