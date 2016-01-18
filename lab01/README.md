@@ -25,12 +25,11 @@ We advice you to use a Linux machine in the Lab 2 to do this exercise if possibl
         ```
         $ ghc -o main Main.hs
         ```
-   3. You can then run the executable from the terminal (./hello on Unix
-      systems, hello.exe on
-      Windows):
+   3. You can then run the executable from the terminal (`./main` on Unix
+      systems, `main.exe` on Windows):
 
         ```
-        $ ./hello
+        $ ./main
         Hello, World!
         ```
 
