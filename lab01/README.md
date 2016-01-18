@@ -1,7 +1,7 @@
 Lab 1: Haskell Programming, 9.00-10.00
 ======================================
 
-Please either use a Linux machine in the Lab 2 to do this exercise or install
+Please either use a Linux machine in the Lab 2 or install
 Haskell Platform on your own machine. Installation packages are available for
 Linux, Mac, and Windows:
 
@@ -10,7 +10,7 @@ https://www.haskell.org/platform/
 ```
 
 Haskell distribution on lab machines is slightly outdated (GHC 7.6) and the
-Cabal build system does not contain some newer features, which you get when
+version of Cabal build system does not support some newer features, which you get when
 you install the newest platform on your own. Please pay attention to the
 following instructions as the two options (older and newer Cabal) are slightly 
 different:
@@ -180,8 +180,8 @@ different:
 
 
 5. Implement your own boolean functions `myAnd`, `myOr`, `myImply`, and `myXor`.
-   Behaviour of these function is described in comments in the file *Main.hs*
-   For each function uncommon the type signature and provide an implementation.
+   Behaviour of these function is described in comments in the file *Main.hs*.
+   For each function uncomment the type signature and provide an implementation.
 
 6. Define a function that converts boolean value to its textual description. Yet
    again the specification and type signature is in comments in *Main.hs*
