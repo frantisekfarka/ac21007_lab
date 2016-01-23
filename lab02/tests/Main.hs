@@ -11,6 +11,7 @@ import Test.QuickCheck (
     , choose
     , Gen
     , elements
+    , maxSuccess
     )
 import Test.QuickCheck.Test   (isSuccess)
 import Test.QuickCheck.Arbitrary (
@@ -129,16 +130,27 @@ quickCheckFailWith args p = do
 
 -- | Helper, ditto
 quickCheckFail :: Testable prop => prop -> IO ()
-quickCheckFail p = quickCheckFailWith stdArgs p
+quickCheckFail p = quickCheckFailWith ourArgs p
+
+ourArgs :: Args
+ourArgs = stdArgs {
+      maxSuccess = 500
+    }
 
 -- | Run all the properties
 main :: IO ()
 main = do
+    putStrLn "\ndeletion:"
     quickCheckFail prop_deletion
+    putStrLn "\nsearch:"
     quickCheckFail prop_search
+    putStrLn "\nrevprefix:"
     quickCheckFail prop_revprefix
+    putStrLn "\nexists:"
     quickCheckFail prop_exists
+    putStrLn "\ninsertAt:"
     quickCheckFail prop_insertAt
+    putStrLn "\nsortList:"
     quickCheckFail prop_sortList
 
 
