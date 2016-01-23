@@ -38,9 +38,8 @@ different:
         ```
         $ ghc -o helloWorld Main.hs
         ```
-   3. You can then run the executable from the terminal (./hello on Unix
-      systems, hello.exe on
-      Windows):
+   3. You can then run the executable from the terminal (`./helloWorld` on Unix
+      systems, `helloWorld.exe` on Windows):
 
         ```
         $ ./helloWorld
@@ -81,7 +80,7 @@ different:
         hello :: String -> String
         ```
 
-        or alternatively get more information using a command `:into <function>`
+        or alternatively get more information using a command `:info <function>`
 
     3. Run the function `hello` from GHCi with some argument, e.g.
 
@@ -180,10 +179,8 @@ different:
 
 
 5. Implement your own boolean functions `myAnd`, `myOr`, `myImply`, and `myXor`.
-   Behaviour of these function is described in comments in the file *Main.hs*.
+   Behaviour of these functions is described in comments in the file *Main.hs*.
    For each function uncomment the type signature and provide an implementation.
 
 6. Define a function that converts boolean value to its textual description. Yet
    again the specification and type signature is in comments in *Main.hs*
-
-
