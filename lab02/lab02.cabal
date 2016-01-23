@@ -28,7 +28,7 @@ library
 test-Suite lab2-test
   type:                 exitcode-stdio-1.0
   default-Language:     Haskell2010
-  hs-source-dirs:       tests .
+  hs-source-dirs:       tests src
   ghc-options:          -Wall
   main-is:              Main.hs
   build-depends:        base
