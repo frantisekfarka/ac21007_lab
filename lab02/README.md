@@ -20,6 +20,19 @@ please pay attention to the following instructions:
    commands:
 
    1. For GHC 7.6:
+    Configure the package and install any missing dependencies (libraries
+    that our package 'lab2' depends on)
+
+    ```
+    cabal configure
+    cabal install --only-dependencies
+    ```
+
+        Now you can run your package in the GHCi:
+    
+    ```
+    ghci src/Lab2.hs
+    ```
 
 
    2. For GHC 7.8 and newer: 
@@ -62,6 +75,26 @@ please pay attention to the following instructions:
    there are any problems:
 
    1. For GHC 7.6:
+      Reconfigure your package and enable test, install any missing
+      dependencies (tests may, and do, require further libraries),
+      and build the package:
+
+    ```
+    cabal configure --enable-test
+    cabal install --only-dependencies
+        cabal build
+    ```
+
+      Now run the test suite:
+
+    ```
+    $ cabal test
+    Running 1 test suites...
+    Test suite lab2-test: RUNNING...
+    Test suite lab2-test: PASS
+    Test suite logged to: dist/test/lab02-0.1.0.0-lab2-test.log
+    1 of 1 test suites (1 of 1 test cases) passed.
+    ```
 
 
    2. For GHC 7.8 and newer: 
@@ -95,11 +128,18 @@ please pay attention to the following instructions:
    ask!).
 
    If you want to fix your definitions in 'src/Lab2.hs' you do not need to
-   reconfigure the whole package. Just update the file 'Lab2.hs' and re-run
-   the test suit:
+   reconfigure the whole package. Just update the file 'Lab2.hs', rebuild
+   your library and re-run the test suit:
 
    ```
+   cabal build 
    cabal test
+   ```
+
+   or, if you are using \*nix:
+
+   ```
+   cabal build && cabal test
    ```
 
 
