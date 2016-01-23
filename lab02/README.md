@@ -1,4 +1,4 @@
-Lab 2: Haskell, 9.00-10.00
+Lab 2: Haskell
 ======================================
 
 Please either use a Linux machine in the Lab 2 or the Haskell Platform you have
@@ -9,10 +9,10 @@ please pay attention to the following instructions:
 
 1. Update your local copy of this repository:
 
-        ```
-        $ git pull
-        $ cd ac21007_lab/lab02
-        ```
+    ```
+    $ git pull
+    $ cd ac21007_lab/lab02
+    ```
 
 2. In Lab 2 you are provided with a package 'lab2'. This is a library of some
    basic list functions. Note that this package does not contain any executable

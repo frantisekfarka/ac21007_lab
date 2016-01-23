@@ -1,4 +1,4 @@
-Lab 1: Haskell Programming, 9.00-10.00
+Lab 1: Haskell 
 ======================================
 
 Please either use a Linux machine in the Lab 2 or install
