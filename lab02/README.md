@@ -20,37 +20,37 @@ please pay attention to the following instructions:
    commands:
 
    1. For GHC 7.6:
-    Configure the package and install any missing dependencies (libraries
-    that our package 'lab2' depends on)
+      Configure the package and install any missing dependencies (libraries
+      that our package 'lab2' depends on)
 
-    ```
-    cabal configure
-    cabal install --only-dependencies
-    ```
+      ```
+      cabal configure
+      cabal install --only-dependencies
+      ```
 
-        Now you can run your package in the GHCi:
+      Now you can run your package in the GHCi:
     
-    ```
-    ghci src/Lab2.hs
-    ```
+      ```
+      ghci src/Lab2.hs
+      ```
 
 
    2. For GHC 7.8 and newer: 
-        Initialise a new sandbox environment, configure the package and install
-        any missing dependencies (libraries that our package 'lab2' depends on)
+      Initialise a new sandbox environment, configure the package and install
+      any missing dependencies (libraries that our package 'lab2' depends on)
 
-        ```
-        cabal sandbox init
-        cabal configure
-        cabal install --dependencies-only
-        ```
+      ```
+      cabal sandbox init
+      cabal configure
+      cabal install --dependencies-only
+      ```
 
-        Now you can build your package and run the GHCi:
+      Now you can build your package and run the GHCi:
 
-        ```
-        cabal build
-        cabal repl
-        ```
+      ```
+      cabal build
+      cabal repl
+      ```
 
    
 3. Source code of this package is stored in the folder './src'.  However, actual
@@ -79,22 +79,22 @@ please pay attention to the following instructions:
       dependencies (tests may, and do, require further libraries),
       and build the package:
 
-    ```
-    cabal configure --enable-test
-    cabal install --only-dependencies
-        cabal build
-    ```
+      ```
+      cabal configure --enable-test
+      cabal install --only-dependencies
+      cabal build
+      ```
 
       Now run the test suite:
 
-    ```
-    $ cabal test
-    Running 1 test suites...
-    Test suite lab2-test: RUNNING...
-    Test suite lab2-test: PASS
-    Test suite logged to: dist/test/lab02-0.1.0.0-lab2-test.log
-    1 of 1 test suites (1 of 1 test cases) passed.
-    ```
+      ```
+      $ cabal test
+      Running 1 test suites...
+      Test suite lab2-test: RUNNING...
+      Test suite lab2-test: PASS
+      Test suite logged to: dist/test/lab02-0.1.0.0-lab2-test.log
+      1 of 1 test suites (1 of 1 test cases) passed.
+      ```
 
 
    2. For GHC 7.8 and newer: 
@@ -102,21 +102,21 @@ please pay attention to the following instructions:
       dependencies (tests may, and do, require further libraries),
       and build the package:
 
-        ```
-        cabal configure --enable-tests
-        cabal install --dependencies-only
-        cabal build
-        ```
+      ```
+      cabal configure --enable-tests
+      cabal install --dependencies-only
+      cabal build
+      ```
 
       Now run the test suite:
 
-        ```
-        $ cabal test
-        Test suite lab2-test: RUNNING...
-        Test suite lab2-test: PASS
-        Test suite logged to: dist/test/lab02-0.1.0.0-lab2-test.log
-        1 of 1 test suites (1 of 1 test cases) passed.
-        ```
+      ```
+      $ cabal test
+      Test suite lab2-test: RUNNING...
+      Test suite lab2-test: PASS
+      Test suite logged to: dist/test/lab02-0.1.0.0-lab2-test.log
+      1 of 1 test suites (1 of 1 test cases) passed.
+      ```
 
 
 
