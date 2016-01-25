@@ -1,13 +1,38 @@
 -- | Haskell Lab 2 exercises
+--
+-- In this lab exercisses you are going to need a new type - type of characters.
+-- This type is called 'Char' and values of this type are single characters,
+-- delimited by single quotes ('), e.g:
+--
+-- > 'a' 'b' 'c' ... 'A' 'B' ... '0' '1' ... '!' '?' ... '\t' '\n'
+--
+-- You can use characters as value pattersn in the same way you use e.g. 'True'
+--
+-- Note that integer zero (@0 :: Int@) and character for zero (@'0' :: Char@) are
+-- two different values and __cannot__ be used interchangeably.
+-- 
+-- The 'String' type, which we alrady know, is in fact only and alias for a list
+-- of characters, i.e. ['Char']. As such, you can use list constructors for
+-- pattern matching on strings, e.g.:
+-- 
+-- > containsLowercaseA :: String -> Bool
+-- > containsLowercaseA []      = False
+-- > containsLowercaseA ('a':_) = True
+-- > containsLowercaseA (_:ss)  = containsLowercaseA ss
+-- 
 module Lab2 (
-      deletion -- cmnt
+      deletion 
     , search
+    , append
     , revprefix
     , forAll
     , exists
     , insertAt
     , sortList
 ) where
+
+
+
 
 -- | Implement a deletion function for a list of 'Char' (i. e.
 -- a 'String').
@@ -54,6 +79,22 @@ deletion = undefined
 --
 search :: [(Int, String)] -> Int -> [String]
 search = undefined
+
+
+-- | Define an 'append' function
+--
+-- This function appends two list, e.g.:
+--
+-- >>> append [1, 2, 3] [4, 5] 
+-- [1, 2, 3, 4, 5]
+--
+-- >>> append "Hello " "World!"
+-- "Hello World!"
+--
+-- Please do not use the ('++') operator.
+--
+append :: [a] -> [a] -> [a]
+append = undefined
 
 
 -- | Define a reverse-prefix function. 
@@ -130,4 +171,6 @@ insertAt = undefined
 --
 sortList :: [(Int, String)] -> [(Int, String)]
 sortList = undefined
+
+
 

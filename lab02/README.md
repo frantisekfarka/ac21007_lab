@@ -3,7 +3,21 @@ Lab 2: Haskell
 
 Please either use a Linux machine in the Lab 2 or the Haskell Platform you have
 installed on your machine.  Yet again, as the versions of GHC and cabal vary
-please pay attention to the following instructions:
+please pay attention to the instructions.
+
+These lab exercises are provided as a cabal package. All the necessary commands
+are listed in these instructions and if you have used any command line
+package/project management utility before these should be familiar.
+You do not need any further knowledge of Cabal. However, if you want to know
+more please refer to Cabal User Guide:
+
+```
+https://www.haskell.org/cabal/users-guide/
+```
+
+In particular to chapters 'Introduction' and 'Building, installing and managing
+packages'
+
 
 
 

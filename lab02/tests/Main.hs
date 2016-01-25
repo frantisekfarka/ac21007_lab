@@ -23,6 +23,7 @@ import Test.QuickCheck.Arbitrary (
 import Lab2 (
       deletion
     , search
+    , append
     , revprefix
     , forAll
     , exists
@@ -79,6 +80,12 @@ prop_search dict = do
             True
     where 
         mySearch ds k  = map snd $  filter (((==) k) . fst) ds
+
+
+-- | Prop append
+--
+prop_append :: String -> String -> Bool
+prop_append a b = append a b == a ++ b
 
 
 -- | Prop revprefix
@@ -144,6 +151,8 @@ main = do
     quickCheckFail prop_deletion
     putStrLn "\nsearch:"
     quickCheckFail prop_search
+    putStrLn "\nappend:"
+    quickCheckFail prop_append
     putStrLn "\nrevprefix:"
     quickCheckFail prop_revprefix
     putStrLn "\nexists:"
