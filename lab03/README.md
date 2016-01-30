@@ -1,8 +1,8 @@
 Lab 2: Haskell
 ======================================
 
-These lab exercises are provided as a cabal package. All the neccessary commands
-have been introduced in previous labs, please reffer to these.
+These lab exercises are provided as a cabal package. All the necessary commands
+have been introduced in previous labs, please refer to these.
 
 Please either use a Linux machine in the Lab 2 or the Haskell Platform you have
 installed on your machine.  Yet again, as the versions of GHC and cabal vary
@@ -10,7 +10,7 @@ please pay attention to the instructions.
 
 
 1. Update your local copy of this repository using `git pull`. In case of any
-   local conflicts use git commands `git add` and `git commit`. Please reffer to 
+   local conflicts use git commands `git add` and `git commit`. Please refer to 
    documentation if needed.
 
    Alternatively you can git clone a completely new version of this repository
@@ -48,7 +48,7 @@ please pay attention to the instructions.
    definitions of library functions are missing. Your task is to provide these
    definitions. Please open the file './src/Lab3.hs' and follow instructions
    there. Yet again, generating Haddock documentation and opening it in a web
-   browser might be helpfull.
+   browser might be helpful.
    
 4. This package is equipped with a test suite. Once you have implemented all
    the functions in the file 'src/Lab3.hs' you can run the test to see whether
