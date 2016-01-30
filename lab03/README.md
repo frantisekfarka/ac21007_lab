@@ -1,4 +1,4 @@
-Lab 2: Haskell
+Lab 3: Haskell
 ======================================
 
 These lab exercises are provided as a cabal package. All the necessary commands
