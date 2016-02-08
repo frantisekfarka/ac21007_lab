@@ -29,22 +29,20 @@ module Lab4 (
     , bubbleSortWith
 ) where
 
-import Data.List (sortBy) 
-
 -- | Implement a variant of Selection Sort that uses an accesor function
 --
 selectionSortWith :: (a -> Int) -> [a] -> [a]
-selectionSortWith f = sortBy (\a b -> f a `compare` f b)
+selectionSortWith = undefined
 
 -- | Implement a variant Insertion Sort that uses an accesor function
 --
 insertionSortWith :: (a -> Int) -> [a] -> [a]
-insertionSortWith f = sortBy (\a b -> f a `compare` f b)
+insertionSortWith = undefined
 
 -- | Implement a variant Bubble Sort that uses an accesor function
 --
 bubbleSortWith :: (a -> Int) -> [a] -> [a]
-bubbleSortWith f = sortBy (\a b -> f a `compare` f b)
+bubbleSortWith = undefined
 
 
 
