@@ -4,9 +4,9 @@ Lab 5: Haskell
 These lab exercises are yet again provided as a library. There are the following
 files:
 
-    * [Lab5.hs](./src/Lab5.hs) - the usual module with tasks for this lab,
-        in folder 'src'
-    * [Main.hs](./tests/Main.hs) - test-suit for tasks in Lab5
+* [Lab5.hs](./src/Lab5.hs) - the usual module with tasks for this lab, in folder
+  'src'
+* [Main.hs](./tests/Main.hs) - test-suit for tasks in Lab5
 
 However, this time the cabal project file is missing. You need to initialise
 this folder as a package yourself and create the project file. Follow the
@@ -15,9 +15,9 @@ cabal documentation (see earlier lab sheets)
 
 A new project is initialised from within project folder using 'cabal' utility:
 
-    ```sh
+```sh
     cabal init
-    ```
+```
 
 Cabal will prompt you for package specification -- e.g. package name, version,
 license. Most of has a reasonable default value or can be empty, feel free to
@@ -26,11 +26,11 @@ keep at least package name to default "lab05".
 
 What you need to specify properly is what the package builds:
 
-    ```
+```
     What does the package build:
         1) Library
         2) Executable
-    ```
+```
 
 In this case it is a library. Now open the newly generated file lab05.cabal (or
 another name, depending on the name you provided previously) and check your new
