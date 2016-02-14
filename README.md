@@ -34,3 +34,13 @@ Lab Assignments
         - Selection Sort
         - Insertion Sort
         - Bubble Sort
+
+* [Lab 5](lab05/README.md)
+    - cabal project file
+    - tail recursion
+        - alg vs. algT
+    - folds
+        - sumSquare
+        - split
+        - merge
+    - reconstructing data type from functions and instances
