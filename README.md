@@ -10,6 +10,7 @@ Lecture Slides
 * [Lecture 4: Higher order functions, map, folds ](slides/lec4.pdf)
 * [Lecture 5: Selection Sort, Insertion Sort, and Bubble Sort](slides/lec5.pdf)
 * [Lecture 6: Tail Recursion, Algebraic Data Types, Type Classes](slides/lec6.pdf)
+* [Lecture 7: Quick Sort, Monadic IO](slides/lec7.pdf)
 
 
 Lab Assignments
