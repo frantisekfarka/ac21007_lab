@@ -19,5 +19,11 @@ cabal.config
 #vim 
 *.sw?
 
-#CoALPj
-.history_file
+#latex
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.vrb
+
