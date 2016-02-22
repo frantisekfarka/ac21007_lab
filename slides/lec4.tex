@@ -1,0 +1,502 @@
+\documentclass[final,handout]{beamer}
+\definecolor{green}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0,0, 0.6}
+%\setbeamertemplate{headline}[verdeuni]
+%\setbeamercovered{highly dinamic}
+%\usepackage{eso-pic}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usepackage{alltt}
+\usepackage{etex, xy}
+ \usepackage{tipa}
+
+\xyoption{all} %para los diagramas
+\usepackage{cancel}
+\usepackage{verbatim}
+%\usepackage{slashbox}
+\usetikzlibrary{decorations.pathreplacing,shapes.arrows}
+\newcommand\BackgroundPicture[1]{%
+  \setbeamertemplate{background}{%
+   \parbox[c][\paperheight]{\paperwidth}{%
+      \vfill \hfill
+\includegraphics[width=1\paperwidth,height=0.9\paperheight]{#1}
+        \hfill \vfill
+     }}}
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\newcommand{\rrdc}{\mbox{\,\(\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Right reduction
+\newcommand{\lrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\)\,}}% Left reduction
+\newcommand{\lrrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\hspace{-5pt}\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Equivalence
+\DeclareMathOperator{\id}{Id}
+\newcommand{\sCoq}{{\sc Coq}}
+\newcommand{\SSReflect}{{\sc SSReflect}}
+\newcommand{\Zset}{\mathbb{Z}}
+\newcommand{\Bset}{\mathbb{Z}_2}
+
+
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{Defn}{Definition}
+\newtheorem{Goal}{Goal}
+\newtheorem{GGoal}{General Goal}
+\newtheorem{Alg}{Algorithm}
+\newcommand{\inp}{{\itshape Input: }}
+\newcommand{\outp}{{\itshape Output: }}
+
+\renewcommand{\thefootnote}{$\ast$}
+\title[Haskell Lecture 3: TBD]{AC21007: Haskell Lecture 4\\
+    Higher order functions, map, folds
+}
+\author[Franti\v{s}ek Farka]{Franti\v{s}ek Farka}
+\date{}
+\usetikzlibrary{arrows}
+
+\newcommand{\boxtt}[1]{\mbox{\scriptsize\texttt{#1}}}\newcommand{\cU}{\mathcal{U}}
+
+
+\begin{document}
+\BackgroundPicture{fondo1.png}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation}
+
+    \begin{itemize}
+        \item Data type tuple \texttt{(a, b)}
+        \item Non-strict semantics:
+            \begin{itemize}
+                    \item expressions evaluated on-demand
+                    \item allows infinite data structures (lists)
+            \end{itemize}
+  \end{itemize}
+\end{frame}  
+
+
+
+
+
+\begin{frame}[fragile]
+    \frametitle{Anonymous (lambda) functions}
+
+    \begin{itemize}
+        \item<4-> Functions without a name
+        \item<4->  Syntax:
+            \begin{alltt}
+    \textbackslash{}<var\(\sb{1}\)> \dots <var\(\sb{n}\)> -> <expr>
+            \end{alltt}
+        Variables $var_1$ to $var_n$ in scope in the expression $expr$
+            
+        \item<5-> Anonymous functions:
+            
+            \begin{itemize}
+                \item<6-> can be applied to an argument:\\
+                    \texttt{(\textbackslash x -> 2 + x) 3 ==> 5}
+                \item<7-> can be passed as an argument \\
+                        \dots anonymous functions \textbf{are} values
+            \end{itemize}
+
+        \item<2-> \onslide<8->{E.g.:}\\
+    \texttt{                ~~~~~2 + 3 :: Int}\\
+    \texttt{\onslide<4->{\textbackslash{}x ->} 2 + x :: \onslide<4->{Int ->} Int}\\
+    \texttt{\onslide<3>{~~~Not in scope: `x`}}
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Anonymous (lambda) functions (cont.)}
+
+    \begin{itemize}
+        \item \texttt{filter}, applied to a predicate and a list, returns the list of
+            those elements that satisfy the predicate
+    \pause
+        \begin{alltt}
+    filter :: (a -> Bool) -> [a] -> [a]
+    filter _    []     = []
+    filter pred (x:xs) = if (pred x)
+        then x : filter pred xs
+        else filter pred xs
+        \end{alltt}
+
+        \item<3-> E.g:
+        \begin{verbatim}
+    filter (\x -> x `mod` 2 == 1) [1, 2, 3, 4, 5, 6]
+        ==> [1, 3, 5]
+
+    filter (\x -> x `mod` 2 == 0) [1, 2, 3, 4, 5, 6]
+        ==> [2, 4, 6]
+        \end{verbatim}
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{First-class functions}
+
+    \begin{itemize}
+        \item All functions can be passed as an argument, 
+            e.g standard functions \texttt{even} and \texttt{odd}:
+        \begin{verbatim}
+    filter odd [1, 2, 3, 4, 5, 6]
+        ==> [1, 3, 5]
+
+    filter even [1, 2, 3, 4, 5, 6]
+        ==> [2, 4, 6]
+        \end{verbatim}
+        \item<2-> All functions are just values
+        \item<3-> We will call functions that take a function as an argument
+            \emph{higher order functions}
+%        \item Function type \texttt{a -> b} (right-associative)
+%        \item Values of this types constructed by
+%            \begin{itemize}
+%                \item usual function definition
+%                \item lambda construction
+%            \end{itemize}
+
+
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Some useful higher order functions}
+    \begin{itemize}
+        \item<1-> \texttt{map} - applies a function to each element of a list
+            \begin{alltt}
+    map :: (a -> b) -> [a] -> [b]
+    map _ []     = []
+    map f (x:xs) = f x : map f xs
+\pause
+map (\textbackslash{}x -> 2 * x)) [1, 2, 3, 4]
+    ==> [2, 4, 6, 8]
+            \end{alltt}
+
+        \item<3-> \texttt{zipWith} - generalises \texttt{zip}, combines list elements
+            with the function in its first argument, truncates the longer list
+            \begin{alltt}
+    zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+    zipWith _ []     _      = []
+    zipWith _ _    []       = []
+    zipWith f (a:as) (b:bs) = f a b : zipWith f as bs
+\pause
+zipWith (+) [2, 3, 4] [5, 6, 7]
+    [7, 9, 11]
+            \end{alltt}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{First-class functions (cont)}
+
+    \begin{itemize}
+        \item<1-> Function type \texttt{a -> b} (right-associative)
+        \item<2-> Values of this type are constructed by:
+            \begin{itemize}
+                \item<3-> the usual function definitions
+                \item<3-> lambda constructions
+            \end{itemize}
+
+
+        \item<4-> \onslide<9->{The following definitions of \texttt{max} are
+            equivalent:}\\
+            ~\\
+            \texttt{~~~max :: \onslide<7->{(}Int -> \onslide<5->{(}Int ->
+            Int\onslide<5->{)}\onslide<7->{)}}\\
+            \texttt{\onslide<5->{--} max x y = if x > y then x else y}\\
+            \texttt{\onslide<7->{--} \onslide<5->{max x =}
+                \onslide<6->{\textbackslash y ->
+            if x > y then x else y}}\\
+            \texttt{~~~\onslide<7->{max =}
+                \onslide<8->{\textbackslash x y ->
+            if x > y then x else y}}\\
+
+        \vskip 1em
+
+        \item<10-> Haskell compiler will figure out types from
+            LHS patterns and type of RHS expression
+        \item<11-> {\color{green}Note:} In a function definition all equations
+            must have the same number of LHS patterns
+
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Currying}
+
+    \begin{itemize}
+        \item<1-> \textbf{currying} - translating the evaluation of a function that
+            takes multiple arguments \onslide<3->{(a tuple of arguments)} into
+            evaluating a sequence of (higher-order) functions, each with a single 
+            argument
+        \item<2-> A variant of \texttt{max}:
+            \begin{alltt}
+    max' :: (d, d) -> d
+    max' (x, y) = if x > y then ...
+            \end{alltt}
+
+        \item<4-> We can express this translation as higher-order function:
+            \begin{alltt}
+    curry :: ((a, b) -> c) -> a -> b -> c
+    curry f x y = f (x, y)
+            \end{alltt}
+            
+        \item<5->There is also the reverse translation:
+            \begin{alltt}
+    uncurry :: (a -> b -> c) -> (a, b) -> c
+    uncurry f (x, y) = f x y
+            \end{alltt}
+    \end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]
+    \frametitle{Function manipulation}
+
+    \begin{itemize}
+        \item<1-> Composition
+            \begin{itemize}
+                \item The usual $(f.g)(x) = f(g(x))$
+                \item<2-> Operator \texttt{(.)}, higher order function:
+                    \begin{alltt}
+    (.) :: (b -> c) -> (a -> b) -> a -> c
+    f . g = \textbackslash x -> f (g x)
+                    \end{alltt}
+                \item<3-> E.g.:
+                    \begin{alltt}
+    filter even . (filter (\textbackslash x -> x `mod` 3 == 0))  
+                    \end{alltt}
+            \end{itemize}
+        \item<4-> Partial application
+            \begin{itemize}
+                \item We can provide function only with first n arguments
+                \item Result is a partially applied function - a new function
+                    taking the rest of arguments
+                \item<5-> E.g: \texttt{max 5, (1 +), (2 *)}
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List folding}
+
+    \begin{itemize}
+        \item Let's compare two recursive functions on lists:
+
+        \begin{itemize}
+            \item Function \texttt{sum}:
+            \begin{alltt}
+    sum :: [Integer] -> Integer
+    sum []           = 0
+    sum (x : xs)     = x + sum xs
+            \end{alltt}
+
+        \item Function \texttt{maximum}:
+            \begin{alltt}
+    maximum :: [Integer] -> Integer
+    maximum []       = error "empty list"
+    maximum (x : []) = x
+    maximum (x : xs) = max x (maximum xs)
+            \end{alltt}
+        \end{itemize}
+
+    \item<2-> {\color{red}Recursive case has the same structure:}
+            $$
+            recf \quad (x:xs) \quad = \quad f \quad x \quad (recf \quad xs)
+            $$
+        %\item Base case is different \dots
+
+    \end{itemize}
+    ~
+    \\~
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List folding}
+
+    \begin{itemize}
+        \item Let's compare two recursive functions on lists:
+
+        \begin{itemize}
+            \item Function \texttt{sum}:
+            \begin{alltt}
+    sum :: [Integer] -> Integer
+    sum []           = 0
+    {\color{green}sum (x : xs)     = (+) x (sum xs)}
+            \end{alltt}
+
+        \item Function \texttt{maximum}:
+            \begin{alltt}
+    maximum :: [Integer] -> Integer
+    maximum []       = error "empty list"
+    maximum (x : []) = x
+    maximum (x : xs) = max x (maximum xs)
+            \end{alltt}
+        \end{itemize}
+
+        \item Recursive case has the same structure:
+            $$
+            recf \quad (x:xs) \quad = \quad f \quad x \quad (recf \quad xs)
+            $$
+        \item<2-> Base case is different \dots
+
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{List folding (cont.)}
+
+    \begin{itemize}
+        \item Let's slightly modify our two functions:
+
+            \item Function \texttt{sum}: \\
+    {\tt\small
+sum :: \onslide<10->{(Int -> Int -> Int) ->}\\
+~~~~ \onslide<2->{Int -> }[Int] -> Int\\
+sum~~~~ \onslide<11->{\_} \onslide<2->{val} []~~~~~~~ = \onslide<1>{0}\onslide<2->{val}\\
+sum~~~~ \onslide<11->{f} \onslide<3->{val} (x : xs) =
+\onslide<12->{f}\onslide<1-11>{(+)} x (sum \onslide<12->{f} \onslide<3->{val} xs)
+\\~\\
+\quad sum \onslide<13->{(+)} \onslide<4->{0} [1, 2, 3, 4, 5]
+}
+\\~
+        \item Function \texttt{maximum}: \\
+    {\tt\small
+maximum :: \onslide<14->{(Int -> Int -> Int) ->}\\
+~~~~ \onslide<5->{Int ->} [Int] -> Int\\
+maximum \onslide<14->{\_} \onslide<6->{val} []~~~~~~~ =
+\onslide<6->{val}\only<beamer>{\onslide<1-5>{error "..."}}\\
+\only<beamer>{\onslide<1-6>{maximum~~~~~~ (x : []) = x}\\}
+maximum \onslide<14->{f} \onslide<8->{val} (x : xs) =
+\onslide<14->{f}\onslide<1-13>{max} x (maximum \onslide<14->{f} \onslide<8->{val} xs)\\
+~\\
+\quad maximum \onslide<14->{max} \onslide<9->{3}
+[\only<beamer>{\onslide<1-8>{3,}} 2, 5, 4, 2]
+}
+
+%        \item Recursive case has the same structure:
+%            $$
+%            recf \quad (x:xs) \quad = \quad f \quad x \quad (recf \quad xs)
+%            $$
+%        \item Base case is different \dots
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List folding - foldr and foldl}
+
+    \begin{itemize}
+        \item One generic function \texttt{foldr} for right-associative recursion:
+
+            \begin{alltt}
+    foldr :: (a -> b -> b) -> b -> [a] -> b
+    foldr _ z []       = z
+    foldr f z (x : xs) = f x (foldr f z)
+            \end{alltt}
+
+        \item<2-> The structure of recursion is\\
+\quad \texttt{foldr f z [x$_1$, x$_2$, \dots, x$_n$]\\ 
+    \quad~\quad==> f x$_1$ (f x$_2$ \dots (f x$_n$)\dots)
+}
+
+        \item<3-> There is also function\\
+
+            \quad\texttt{foldl :: (b -> a -> b) -> b -> [a] -> b}\\
+
+            for left-associative recursion, i.e.:\\~\\
+\quad \texttt{foldl f z [x$_1$, x$_2$, \dots, x$_n$]\\ 
+    \quad~\quad==> f x$_n$ (\dots(f x$_2$ (f x$_1$)\dots)
+}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List folding - examples}
+
+    \begin{itemize}
+        \item Our \texttt{sum} and \texttt{maximum} as folds:
+
+            \begin{alltt}
+    sum :: [Int] -> Int
+    sum xs = foldr (+) 0 xs
+
+    maximum :: [Int] -> Int
+    maximum []     = error "empty list"
+    maximum (x:xs) = foldr max x xs
+            \end{alltt}
+
+        \item A fold where \texttt{a} and \texttt{b} are different:
+
+            \begin{alltt}
+    length :: [a] -> Integer
+    length xs = foldr f 0 xs
+        where
+            -- f :: a -> Integer -> Integer
+            f _ b = 1 + b
+            \end{alltt}
+    \end{itemize}
+\end{frame}
+
+%\begin{frame}[fragile]
+%    \frametitle{Syntactic intermezzo: \texttt{if then else}}
+
+%    \begin{itemize}
+%        \item Haskell has a conditional \textbf{expression}:\\
+%            ~\\
+%            \texttt{{\bf if} <cnd \onslide<2->{:: Bool}> 
+%                {\bf then} <x \onslide<3->{:: a}> 
+%                {\bf else} <y \onslide<3->{:: a}>
+%                ~~~~~~~~~~~~\onslide<4->{:: a}}
+%    \end{itemize}
+%\end{frame}
+
+
+
+\begin{frame}
+    \frametitle{Next time}
+
+    \begin{itemize}
+        \item Monday the the 8th of February, 2-3PM,
+            Dalhousie 3G05 LT2
+        
+        \item Sorting algorithms on lists
+            \begin{itemize}
+                \item Selection Sort
+                \item Insertion Sort
+                \item Bubble Sort
+            \end{itemize}
+        %\item Anonymous functions
+        %\item Higher order functions
+        %\item More (higher-order) list functions (\texttt{map}, \dots)
+        %\item Recursion, folds over lists
+
+    \end{itemize}
+
+\end{frame}
+
+
+
+
+\end{document}
+

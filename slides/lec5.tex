@@ -1,0 +1,424 @@
+\documentclass[final,handout]{beamer}
+%\documentclass[]{beamer}
+\definecolor{green}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0,0, 0.6}
+\definecolor{red}{rgb}{0.6,0, 0}
+\definecolor{gray}{rgb}{0.6,0.6, 0.6}
+%\setbeamertemplate{headline}[verdeuni]
+%\setbeamercovered{highly dinamic}
+%\usepackage{eso-pic}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usepackage{alltt}
+\usepackage{etex, xy}
+\usepackage{tipa}
+
+\xyoption{all} %para los diagramas
+\usepackage{cancel}
+\usepackage{verbatim}
+%\usepackage{slashbox}
+\usetikzlibrary{decorations.pathreplacing,shapes.arrows}
+\newcommand\BackgroundPicture[1]{%
+  \setbeamertemplate{background}{%
+   \parbox[c][\paperheight]{\paperwidth}{%
+      \vfill \hfill
+\includegraphics[width=1\paperwidth,height=0.9\paperheight]{#1}
+        \hfill \vfill
+     }}}
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\newcommand{\rrdc}{\mbox{\,\(\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Right reduction
+\newcommand{\lrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\)\,}}% Left reduction
+\newcommand{\lrrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\hspace{-5pt}\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Equivalence
+\DeclareMathOperator{\id}{Id}
+\newcommand{\sCoq}{{\sc Coq}}
+\newcommand{\SSReflect}{{\sc SSReflect}}
+\newcommand{\Zset}{\mathbb{Z}}
+\newcommand{\Bset}{\mathbb{Z}_2}
+
+
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{Defn}{Definition}
+\newtheorem{Goal}{Goal}
+\newtheorem{GGoal}{General Goal}
+\newtheorem{Alg}{Algorithm}
+\newcommand{\inp}{{\itshape Input: }}
+\newcommand{\outp}{{\itshape Output: }}
+
+\renewcommand{\thefootnote}{$\ast$}
+\title[Haskell Lecture 5]{AC21007: Haskell Lecture 5\\
+    Selection Sort, Insertion Sort, and Bubble Sort
+}
+\author[Franti\v{s}ek Farka]{Franti\v{s}ek Farka}
+\date{}
+\usetikzlibrary{arrows}
+
+\newcommand{\boxtt}[1]{\mbox{\scriptsize\texttt{#1}}}\newcommand{\cU}{\mathcal{U}}
+
+
+\begin{document}
+\BackgroundPicture{fondo1.png}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation}
+
+    \begin{itemize}
+        \item Function type \texttt{a -> b}
+        \item Anonymous functions
+        \item Currying
+        \item Higher order functions
+            \begin{itemize}
+                \item {\tt map}, {\tt filter}
+                \item Folds: {\tt foldr}, {\tt foldl}
+            \end{itemize}
+  \end{itemize}
+\end{frame}  
+
+
+\begin{frame}[fragile]
+    \frametitle{Selection Sort}
+
+    \begin{itemize}
+        \item<1->[Goal:] We must devise an algorithm that sorts a collection of
+            elements 
+
+        \item<2->[Solution:] From those elements that are currently unsorted, find
+            the smallest and place it next in the sorted collection.
+
+        \item<3->[Example:] ~\\ {\tt
+            ~~~~~~~~~~~~~~~~~~~~~\only<4-5>{$\color{red}\downarrow$}\\
+            \only<3->{{[}]~~~~~~~~~~~ [7, 5, 2, 4]}~\\
+            ~~~~~~~~~~~~~~~~~~~~~\only<7-8>{$\color{red}\downarrow$}\\
+            \only<5->{{[}2]}~~~~~~~~~~~\only<6->{[7, 5, 4]}\\
+            ~~~~~~~~~~~~~~~~~~\only<10-11>{$\color{red}\downarrow$}\\
+            \only<8->{{[}2, 4]}~~~~~~~~\only<9->{[7, 5]}\\
+            ~~~~~~~~~~~~~~~\only<13-14>{$\color{red}\downarrow$}\\
+            \only<11->{{[}2, 4, 5]}~~~~~\only<12->{[7]}\\
+            ~\\
+            \only<14->{{[}2, 4, 5, 7]}~~\only<15->{[]}\\
+        }
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Selection Sort - C version}
+
+    \begin{itemize}
+        \item Implementation in C:
+
+            \begin{verbatim}
+void sel_sort(int* a, size_t n) {
+
+    for (size_t i = 0, j; i < (n - 1); ++i) {
+        j = i;
+
+        for (size_t k = i + 1; k < n; ++k) {
+            if (a[k] < a[j])
+                j = k;
+
+            /* int t = a[i]; a[i] =a[j]; a[j] = t; */
+            swap(a, i, j);
+        }
+    }   
+}
+            \end{verbatim}
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Selection Sort - Haskell version}
+
+    \begin{itemize}
+        \item[Goal:] \dots an algorithm that sorts a \emph{list} of
+            elements 
+
+        \item[Solution:] \dots from unsorted, find
+            the smallest and place it next in the sorted list.
+            \pause
+            {\color{green}Empty list is trivially sorted!}
+
+        \item<3->[Function:]
+            \begin{alltt}
+selSortImpl :: [Int] -> [Int] -> [Int]
+selSortImpl sorted []  = sorted
+selSortImpl sorted xs  = 
+        selSortImpl (sorted ++ [x]) (removeFirst x xs)
+     where
+         x = minimum xs
+         removeFirst _ [] = []
+         removeFirst a (x:xs) = if x == a
+            then xs
+            else x : removeFirst a xs
+    \end{alltt}
+    \vskip -5em
+    \only<4->{
+    \begin{alltt}
+selSort :: [Int] -> [Int]\\
+selSort = selSortImpl []
+    \end{alltt}
+}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Insertion Sort}
+
+    \begin{itemize}
+        \item[Goal:] The same \dots
+
+        \item[Solution:] From those elements that are currently unsorted, take 
+            the \emph{first} and place it correctly in the sorted list.
+
+        \item<2->[Example:] ~\\ {\tt
+            ~\\
+            \only<2->{{[}]}~~~~~~~~~~~~\only<2->{[7, 2, 5, 4]}\\
+            ~\only<3->{$\color{red}\downarrow$}\\
+            \only<3->{{[}7]}~~~~~~~~~~~\only<4->{[2, 5, 4]}\\
+            ~\only<5->{$\color{red}\downarrow$}\\
+            \only<5->{{[}2, 7]}~~~~~~~~\only<6->{[5, 4]}\\
+            ~~~~\only<7->{$\color{red}\downarrow$}\\
+            \only<7->{{[}2, 5, 7]}~~~~~\only<8->{[4]}\\
+            ~~~~\only<9->{$\color{red}\downarrow$}\\
+            \only<9->{{[}2, 4, 5, 7]}~~\only<10->{[]}\\
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Insertion Sort - Haskell version}
+
+    \begin{itemize}
+        \item[Function:]
+            \begin{verbatim}
+insSortImpl :: [Int] -> [Int] -> [Int]
+insSortImpl sorted []  = sorted
+insSortImpl sorted (x:xs)  = 
+        insSortImpl (insert x sorted) xs
+     where
+         insert y [] = [y]
+         insert y (z:zs) = if y <= z
+            then y : (z : zs)
+            else z : (insert y zs)
+
+insSort :: [Int] -> [Int]
+insSort = insSortImpl []
+    \end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Syntactic intermezzo: \texttt{let \dots in} expression}
+
+    \begin{itemize}
+        \item We know \texttt{where} syntax
+        \item The \texttt{let \dots in} epression
+            \begin{alltt}
+    {\bf let} <pat\(\sb{1}\)> = <expr\(\sb{1}\)>
+        <pat\(\sb{n}\)> = <expr\(\sb{n}\)> {\bf in} <expr>
+            \end{alltt}
+            is a ``local'' version -- variables that are bound in patterns $pat_1$ to
+            $pat_n$ after evaluating expressions $expr_1$ to $expr_n$ are in scope in
+            $expr$ 
+        \item \dots \textbf{and} in $expr_1$ to $expr_n$ -- bindings may by recursive!
+        \item The expresion has a value of $expr$.
+        \item E.g.:
+            \begin{alltt}
+    \textbackslash x -> let (y, z) = x in y + z
+    let x = 1 : x in x
+            \end{alltt}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Bubble Sort}
+
+    \begin{itemize}
+        \item[Goal:] The same \dots
+
+        \item<2->[Intuition:] In each iteration \emph{bubble up} the greatest element.
+            But which one is it?
+
+        \item<3->[Solution:] 
+            Start with the first element and bubble up as long as it is the
+            greates so far, once we saw greater, continue with that one!
+        
+            \pause
+            In each iteration, \emph{one} element is placed (the greates), after
+            $n$ iterations - $n$ elements placed!
+
+        \item<4->[Example:] ~\\ {\tt \small
+                
+                ~\only<5>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<6>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<7>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<8>{$\color{red}\downarrow$}~\\
+
+                [\underline{5,2},7,4]
+                \only<6->{$\rightarrow$ [2,\underline{5,7},4]} 
+                \only<7->{$\rightarrow$ [2,5,\underline{7,4}]}
+                \only<8->{$\rightarrow$ [2,5,4,7]}~\\
+
+                ~\only<9>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<10>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<11>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<12>{$\color{red}\downarrow$}~\\
+
+                \only<9->{[\underline{2,5},4,{\color{gray}7}]}
+                \only<10->{$\rightarrow$ [2,\underline{5,4},{\color{gray}7}]}
+                \only<11->{$\rightarrow$ [2,4,\underline{5,{\color{gray}7}}]}
+                \only<12->{$\rightarrow$ [2,4,5,{\color{gray}7}]}~\\
+                
+                ~\only<13>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<14>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<15>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<16>{$\color{red}\downarrow$}~\\
+
+                \only<13->{[\underline{2,4},{\color{gray}5,7}]}
+                \only<14->{$\rightarrow$ [2,\underline{4,{\color{gray}5}},7]}
+                \only<15->{$\rightarrow$ [2,4,\underline{{\color{gray}5,7}}]}
+                \only<16->{$\rightarrow$ [2,4,{\color{gray}5,7}]}~\\
+                
+                ~\only<17>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<18>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<19>{$\color{red}\downarrow$}
+                ~~~~~~~~~~~~~~\only<20>{$\color{red}\downarrow$}~\\
+
+                \only<17->{[\underline{2,{\color{gray}4}}{\color{gray},5,7}]}
+                \only<18->{$\rightarrow$ [2,{\color{gray}\underline{4,5},7}]}
+                \only<19->{$\rightarrow$ [2,{\color{gray}4,\underline{5,7}}]}
+                \only<20->{$\rightarrow$ [2,{\color{gray}4,5,7}]}~\\
+        }
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Bubble Sort - Haskell version}
+
+    \begin{itemize}
+        \item[Function:]
+            \begin{verbatim}
+bubbleSortImpl :: Int -> [Int] -> [Int]
+bubbleSortImpl 0 xs  = xs 
+bubbleSortImpl n xs  =
+        bubbleSortImpl (n - 1) (bubble xs)
+     where
+         bubble [] = []
+         bubble (x : []) = x : []
+         bubble (x : y : ys) = if x <= y
+                then x : (bubble (y : ys))
+                else y : (bubble (x : ys))
+
+bubbleSort :: [Int] -> [Int]
+bubbleSort xs = let n = length xs 
+    in bubbleSortImpl n xs
+    \end{verbatim}
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Time complexity}
+
+    \begin{itemize}
+        \item Not that easy as with Turing Machine, RAM, or C
+        \item<2-> Abstract, non-mutable structures, no (out-of-box) direct indexing:
+            \begin{itemize}
+                \item In C, for \texttt{ar} array, and \texttt{n} index \\
+                    \begin{verbatim}
+    ar[n]
+                    \end{verbatim}
+                    is a ``primitive" action, $\mathcal{O}(1)$!
+                \item<3-> In Haskell, for \texttt{lst} list, and \texttt{n} index\\
+                    \begin{verbatim}
+    lst !! n
+                    \end{verbatim}
+                    is a function call to
+                    \begin{verbatim}
+    (!!) :: Int -> [a] -> a
+    (x:_)  !! 0  = x
+    (_:xs) !! i  = xs !! (i - 1)
+                    \end{verbatim}
+                    in time $\mathcal{O}(n)$
+            \end{itemize}
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Time complexity}
+
+    \begin{itemize}
+        \item Not that easy as with Turing Machine, RAM, or C
+        \item<2-> Lazy evaluation
+            \begin{itemize}
+                \item In C
+                    \begin{verbatim}
+    int dummy_minimum(int* ar, size_t n)
+    {
+        sel_sort(ar, n); // runs in O(n^2)
+        return arr[0];   // runs in O(1)
+    }
+                    \end{verbatim}
+                    runs in $\mathcal{O}(n^2)$
+                \item<3-> In Haskell
+                    \begin{verbatim}
+    dummyMinimum :: [Int] -> Int
+    dummyMinimum xs =
+        head (           -- runs in O(1)
+            selSort xs   -- only first selection 
+                         --   evaluated - in O(n) !
+        )
+                    \end{verbatim}
+                    runs in $\mathcal{O}(n)$
+            \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Time complexity}
+
+    \begin{itemize}
+        \item Not that easy as with Turing Machine, RAM, or C
+        \item Abstract, non-mutable structures, no (out-of-box) direct indexing
+        \item Lazy evaluation
+        \item Some algorithms are naturally imperative, other
+            are functional!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Next time}
+
+    \begin{itemize}
+        \item Monday the the 15th of February, 2-3PM,
+            Dalhousie 3G05 LT2
+        
+        \item Defined data types
+        \item Ad-hoc polymorphism: Typeclasses
+
+    \end{itemize}
+
+\end{frame}
+
+
+
+\end{document}
+

@@ -1,0 +1,420 @@
+\documentclass[final,handout]{beamer}
+\definecolor{green}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0,0, 0.6}
+%\setbeamertemplate{headline}[verdeuni]
+%\setbeamercovered{highly dinamic}
+%\usepackage{eso-pic}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usepackage{alltt}
+\usepackage{etex, xy}
+ \usepackage{tipa}
+
+\xyoption{all} %para los diagramas
+\usepackage{cancel}
+\usepackage{verbatim}
+%\usepackage{slashbox}
+\usetikzlibrary{decorations.pathreplacing,shapes.arrows}
+\newcommand\BackgroundPicture[1]{%
+  \setbeamertemplate{background}{%
+   \parbox[c][\paperheight]{\paperwidth}{%
+      \vfill \hfill
+\includegraphics[width=1\paperwidth,height=0.9\paperheight]{#1}
+        \hfill \vfill
+     }}}
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\newcommand{\rrdc}{\mbox{\,\(\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Right reduction
+\newcommand{\lrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\)\,}}% Left reduction
+\newcommand{\lrrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\hspace{-5pt}\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Equivalence
+\DeclareMathOperator{\id}{Id}
+\newcommand{\sCoq}{{\sc Coq}}
+\newcommand{\SSReflect}{{\sc SSReflect}}
+\newcommand{\Zset}{\mathbb{Z}}
+\newcommand{\Bset}{\mathbb{Z}_2}
+
+
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{Defn}{Definition}
+\newtheorem{Goal}{Goal}
+\newtheorem{GGoal}{General Goal}
+\newtheorem{Alg}{Algorithm}
+\newcommand{\inp}{{\itshape Input: }}
+\newcommand{\outp}{{\itshape Output: }}
+
+\renewcommand{\thefootnote}{$\ast$}
+\title[Haskell Lecture 3: TBD]{AC21007: Haskell Lecture 3\\
+    Non-strict semantics, tuples
+}
+\author[Franti\v{s}ek Farka]{Franti\v{s}ek Farka}
+\date{}
+\usetikzlibrary{arrows}
+
+\newcommand{\boxtt}[1]{\mbox{\scriptsize\texttt{#1}}}\newcommand{\cU}{\mathcal{U}}
+
+
+\begin{document}
+\BackgroundPicture{fondo1.png}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation}
+
+    \begin{itemize}
+        \item Data type List (\texttt{[]}, \texttt{(:)})
+        \item<2-> Function definition:
+            \begin{itemize}
+                \item<3-> a set of equations:\\
+                    \texttt{<identifier> <pat$_1$> \dots ~<pat$_n$> = <expr>} 
+                \item<4-> patterns:
+                    \begin{itemize}
+                        \item a value (\texttt{True, False, 0, \dots})
+                        \item a variable (\texttt{x, xs, myVariable, \dots})
+                        \item \texttt{\_} -- wildcard, "don't care" pattern
+                        \item list constructors, i.e.: 
+                            \texttt{[], (<pat$_{head}$> : <pat$_{tail}$ )}
+                    \end{itemize}
+            \end{itemize}
+  \end{itemize}
+
+  \onslide<5->{Demo \dots}
+
+\end{frame}  
+
+
+
+%% lazy evaluation -- division by zero
+\begin{frame}[fragile]
+    \frametitle{Non-strict (lazy) semantics}
+
+    \begin{itemize}
+        \item<1-> In Haskell, expressions are evaluated lazily -- not evaluated until
+            needed
+
+        \item<2-> Consider a variant of our \texttt{power} function:
+            \begin{alltt}
+    power' :: Int -> Int -> Float -> Int
+    power' b 0 _ = 1
+    power' b n x = b * (power b (n - 1) x)
+            \end{alltt}
+
+
+    \item<3-> Consider the following function call: \\
+        \vskip 1em
+\pause
+\pause
+    {\tt \small
+        power' 7 2 (1.0 / 0) \\ 
+        \pause $==>$ 7 * (power' 7 (2 - 1) (1.0 / 0)) \\
+        \pause $==>$ 7 * (power' 7 1) (1.0 / 0) \\ 
+        \pause $==>$ 7 * (7 * (power' 7 (1 - 1) (1.0 / 0))) \\
+        \pause $==>$ 7 * (7 * (power' 7 0 (1.0 / 0))) \\
+        \pause $==>$ 7 * (7 * (1)) \\
+        \dots \\
+        $==>$ 49
+    }
+
+
+    \end{itemize}
+
+\end{frame}
+
+%% lazy evaluation -- division by zero
+\begin{frame}[fragile]
+    \frametitle{Non-strict (lazy) semantics - infinite lists}
+
+    \begin{itemize}
+        \item<1-> Consider the following function:
+            \begin{alltt}
+    repeat :: a -> [a]
+    repeat x    =   x : (repeat x)
+            \end{alltt}
+        \pause
+            this function defines an infinite list of elements, e.g:
+            \begin{alltt}
+    repeat 1    ==> [1, 1, 1, 1, 1, 1, ... ]
+            \end{alltt}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Non-strict (lazy) semantics - infinite lists (cont.)}
+
+    \begin{itemize}
+        \item<1-> A more useful example -- powers of an integer:
+            \begin{alltt}
+    powersof :: Integer -> [Integer]
+    powersof b  = pow b 1
+        where
+            pow b p = p : pow b (b * p)
+            \end{alltt}
+            \onslide<3->{
+            this function defines an infinite list, e.g.:
+            \begin{alltt}
+    powersof 2    ==> [1, 2, 4, 8, 16, 32, ... ]
+            \end{alltt}
+        }
+        \item<4-> Our \texttt{power} function:
+            \begin{alltt}
+    power :: Integer -> Integer -> Integer
+    power b n = (powersof b) !! n
+            \end{alltt}
+
+        
+        \item<2-> {\color{green} Note:}
+            \begin{itemize}
+                \item \texttt{Int} is machine integer (32/64 bits),
+                    \texttt{Integer} is arbitrary precision integer
+                \item \texttt{where} block allows for local-scope definitions
+
+            \end{itemize}
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Tuple Datatype -- \texttt{(a, b)}}
+
+    \begin{itemize}
+        \item<1-> Data type \texttt{(a, b)} -- type of pairs of values, polymorphic
+            in both of its components \texttt{a} and \texttt{b}
+        \item<2-> One constructor \texttt{(a, b) :: a -> b -> (a, b)}
+        \item<3-> E.g. \texttt{(True, "hello") :: (Bool, String)}
+        \item<4-> Functions (projections) \texttt{fst} and \texttt{snd}:
+
+            \begin{alltt}
+        fst :: (a, b) -> a
+        fst (x, _) = x
+
+        snd :: (a, b) -> b
+        snd (_, y) = y
+            \end{alltt}
+
+        \item<5-> {\color{green} Note:} tuple constructor may be used as a pattern
+        \item<6-> There are also triples \texttt{(a, b, c)}, quadruples \texttt{(a,
+            b, c, d)}, etc. (no genetic \texttt{fst} and \texttt{snd} though)
+    \end{itemize}
+
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Combining lists and tuples -- \texttt{zip}}
+
+    \begin{itemize}
+        \item \texttt{zip} takes two lists and returns a list of corresponding pairs
+        \item If one input list is short, excess elements of the longer list are
+            discarded
+
+    \pause
+    \end{itemize}
+            \begin{alltt}
+    zip :: [a] -> [b] -> [(a,b)]
+    zip []     _      = []
+    zip _      []     = []
+    zip (a:as) (b:bs) = (a,b) : zip as bs
+        \end{alltt}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Syntactic intermezzo: \texttt{if then else}}
+
+    \begin{itemize}
+        \item Haskell has a conditional \textbf{expression}:\\
+            ~\\
+            \texttt{{\bf if} <cnd \onslide<2->{:: Bool}> 
+                {\bf then} <x \onslide<3->{:: a}> 
+                {\bf else} <y \onslide<3->{:: a}>
+                ~~~~~~~~~~~~\onslide<4->{:: a}}
+        \item<2-> \texttt{<cnd>} is an expression that evaluates to \texttt{Bool}
+        \item<3-> Both branches are expressions that evaluates to a value 
+            of a type \texttt{a}
+        \item<4-> The whole expression evaluates to the appropriate value
+            of a type \texttt{a}
+        \item<5-> \texttt{then} and \texttt{else} branches may be indented by
+            white-space
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Syntactic intermezzo: \texttt{if then else} (cont.)}
+
+    \begin{itemize}
+        \item \texttt{if} is an expression -- it can be used as such, e. g.:
+
+    \begin{alltt}
+ghci> (if ("a" == "b") then 3 else 5) + 2
+    ==> 7
+    \end{alltt}
+
+\item<2->In function definition (note the indentation):
+
+    \begin{alltt}
+    max :: Int -> Int -> Int
+    max x y = if x > y  then x
+                        else y
+    \end{alltt}
+    \end{itemize}
+\end{frame}
+
+
+
+%\begin{frame}[fragile]
+%    \frametitle{Anonymous (lambda) functions}
+%
+%    \begin{itemize}
+%        \item<3-> Functions without a name
+%        \item<3->  Syntax:
+%            \begin{alltt}
+%    \textbackslash{}<var\(\sb{1}\)> \dots <var\(\sb{n}\)> -> <expr>
+%            \end{alltt}
+%        \item<4-> Variables $var_1$ to $var_n$ in scope in the expression $expr$
+%            
+%        \item<5-> Anonymous functions:
+            
+%            \begin{itemize}
+%                \item<5-> can be applied to an argument:\\
+%                    \texttt{(\textbackslash x -> 2 + x) 3 ==> 5}
+%                \item<6-> can be passed as an argument \dots functions \textbf{are}
+%                    values
+%            \end{itemize}
+%
+%        \item<1-> \onslide<7->{E.g.:}\\
+%    \texttt{                ~~~~~2 + 3 :: Int}\\
+%    \texttt{\onslide<3->{\textbackslash{}x ->} 2 + x :: \onslide<3->{Int ->} Int}\\
+%    \texttt{\onslide<2>{~~~Not in scope: `x`}}
+%
+%    \end{itemize}
+%
+%\end{frame}
+
+%\begin{frame}[fragile]
+%    \frametitle{Anonymous (lambda) functions (cont.)}
+%
+%    \begin{itemize}
+%        \item \texttt{filter}, applied to a predicate and a list, returns the list of
+%            those elements that satisfy the predicate
+%    \pause
+%        \begin{alltt}
+%    filter :: (a -> Bool) -> [a] -> [a]
+%    filter _    []     = []
+%    filter pred (x:xs) = if (pred x)
+%        then x : filter pred xs
+%        else filter pred xs
+%        \end{alltt}
+%
+%        \item<3-> E.g:
+%        \begin{verbatim}
+%    filter (\x -> x `mod` 2 == 1) [1, 2, 3, 4, 5, 6]
+%        ==> [1, 3, 5, 7]
+%
+%    filter (\x -> x `mod` 2 == 0) [1, 2, 3, 4, 5, 6]
+%        ==> [2, 4, 6]
+%        \end{verbatim}
+%    \end{itemize}
+%
+%\end{frame}
+
+%\begin{frame}[fragile]
+%    \frametitle{First-class functions}
+%
+%    \begin{itemize}
+%        \item All functions can be passed as arguments, 
+%            e.g standard functions \texttt{even} and \texttt{odd}:
+%        \begin{verbatim}
+%    filter even [1, 2, 3, 4, 5, 6]
+%        ==> [1, 3, 5, 7]
+%
+%    filter even [1, 2, 3, 4, 5, 6]
+%        ==> [2, 4, 6]
+%        \end{verbatim}
+%%        \item Function type \texttt{a -> b} (right-associative)
+%%        \item Values of this types constructed by
+%%            \begin{itemize}
+%%                \item usual function definition
+%%                \item lambda construction
+%%            \end{itemize}
+%
+%
+%
+%    \end{itemize}
+%
+%\end{frame}
+
+%\begin{frame}[fragile]
+%    \frametitle{First-class functions (cont)}
+%
+%    \begin{itemize}
+%        \item<1-> Function type \texttt{a -> b} (right-associative)
+%        \item<2-> Values of this type are constructed by
+%            \begin{itemize}
+%                \item<3-> usual function definitions
+%                \item<3-> lambda constructions
+%            \end{itemize}
+%
+%
+%        \item<4-> \onslide<9->{The following definitions of \texttt{max} are
+%            equivalent:}\\
+%            ~\\
+%            \texttt{~~~max :: \onslide<7->{(}Int -> \onslide<5->{(}Int ->
+%            Int\onslide<5->{)}\onslide<7->{)}}\\
+%            \texttt{\onslide<5->{--} max x y = if x > y then x else y}\\
+%            \texttt{\onslide<7->{--} \onslide<5->{max x =}
+%                \onslide<6->{\textbackslash y ->
+%            if x > y then x else y}}\\
+%            \texttt{~~~\onslide<7->{max =}
+%                \onslide<8->{\textbackslash x y ->
+%            if x > y then x else y}}\\
+%
+%        \vskip 1em
+%
+%        \item<10-> Haskell compiler will figure out types from
+%            LHS patterns and type of RHS expression
+%        \item<11-> {\color{green}Note:} In a function definition all equations
+%            must have the same number of LHS patterns
+%
+%
+%    \end{itemize}
+%
+%\end{frame}
+
+
+
+
+
+\begin{frame}
+    \frametitle{Next time}
+
+    \begin{itemize}
+        \item Monday the the 1st of February, 2-3PM,
+            Dalhousie 3G05 LT2
+        
+        \item Anonymous functions
+        \item Higher order functions
+        \item More (higher-order) list functions (\texttt{map}, \dots)
+        \item Recursion, folds over lists
+
+    \end{itemize}
+
+\end{frame}
+
+
+
+
+\end{document}
+

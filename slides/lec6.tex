@@ -1,0 +1,542 @@
+\documentclass[final,handout]{beamer}
+%\documentclass[]{beamer}
+\definecolor{green}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0,0, 0.6}
+\definecolor{red}{rgb}{0.6,0, 0}
+\definecolor{gray}{rgb}{0.6,0.6, 0.6}
+%\setbeamertemplate{headline}[verdeuni]
+%\setbeamercovered{highly dinamic}
+%\usepackage{eso-pic}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usepackage{alltt}
+\usepackage{etex, xy}
+\usepackage{tipa}
+
+\xyoption{all} %para los diagramas
+\usepackage{cancel}
+\usepackage{verbatim}
+%\usepackage{slashbox}
+\usetikzlibrary{decorations.pathreplacing,shapes.arrows}
+\newcommand\BackgroundPicture[1]{%
+  \setbeamertemplate{background}{%
+   \parbox[c][\paperheight]{\paperwidth}{%
+      \vfill \hfill
+\includegraphics[width=1\paperwidth,height=0.9\paperheight]{#1}
+        \hfill \vfill
+     }}}
+
+\usepackage{color}
+\usepackage{listings}
+\lstset{
+    language=haskell
+}
+
+
+\newcommand{\rrdc}{\mbox{\,\(\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Right reduction
+\newcommand{\lrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\)\,}}% Left reduction
+\newcommand{\lrrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\hspace{-5pt}\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Equivalence
+\DeclareMathOperator{\id}{Id}
+\newcommand{\sCoq}{{\sc Coq}}
+\newcommand{\SSReflect}{{\sc SSReflect}}
+\newcommand{\Zset}{\mathbb{Z}}
+\newcommand{\Bset}{\mathbb{Z}_2}
+
+
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{Defn}{Definition}
+\newtheorem{Goal}{Goal}
+\newtheorem{GGoal}{General Goal}
+\newtheorem{Alg}{Algorithm}
+\newcommand{\inp}{{\itshape Input: }}
+\newcommand{\outp}{{\itshape Output: }}
+
+\renewcommand{\thefootnote}{$\ast$}
+\title[Haskell Lecture 6]{AC21007: Haskell Lecture 6\\
+    Tail Recursion, Algebraic Data Types, Type Classes
+}
+\author[Franti\v{s}ek Farka]{Franti\v{s}ek Farka}
+\date{}
+\usetikzlibrary{arrows}
+
+\newcommand{\boxtt}[1]{\mbox{\scriptsize\texttt{#1}}}\newcommand{\cU}{\mathcal{U}}
+
+
+\begin{document}
+\BackgroundPicture{fondo1.png}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation}
+
+    \begin{itemize}
+        \item Sorting algorithms
+            \begin{itemize}
+                \item Selection Sort
+                \item Insertion Sort
+                \item Bubble Sort
+            \end{itemize}
+  \end{itemize}
+\end{frame}  
+
+
+\begin{frame}[fragile]
+    \frametitle{Tail recursion}
+
+    \begin{itemize}
+        \item A recursive function is tail recursive iff the final result of the
+            recursive call is the final result of the function itself
+        \item I.e. the outermost function applied in an RHS expression.
+
+        \item<2-> Non-tail recursive \texttt{sum}:
+        \begin{lstlisting}
+    sum :: [Int] -> Int
+    sum []      = 0
+    sum (x:xs)  = x + (sum xs)
+        \end{lstlisting}
+
+    \item<3-> A tail-recursive version - we use an additional accumulator \texttt{acc}:
+            \begin{lstlisting}
+    sumAux :: [Int] -> Int -> Int
+    sumAux []       acc = acc {- + 0 -}
+    sumAux (x:xs)   acc = sumAux xs (acc + x)
+
+    sum :: [Int] -> Int
+    sum xs = sumAux xs 0
+            \end{lstlisting}
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Tail recursion - Fibonacci numbers}
+
+    \begin{itemize}
+
+        \item Fibonacci numbers: $F_n = 
+            \begin{cases}
+                = 0 & n = 0 \\
+                = 1 & n = 1 \\
+                = F_{n-1} + F_{n-2} & \text{otherwise} 
+            \end{cases}$
+
+            ~\\
+            $0, 1, 1, 2, 3, 5, 8, 13, \dots$
+
+        \item<2-> Haskell implementation is straightforward:
+
+            \begin{lstlisting}
+    fib :: Integer -> Integer
+    fib 0 = 0
+    fib 1 = 1
+    fib n = fib (n - 1) + fib (n - 2)
+            \end{lstlisting}
+
+        \item<3-> Can we turn this into a tail-recursive function?
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Tail recursion - Fibonacci numbers (cont.)}
+
+    \begin{itemize}
+        \item Observation: recursive step performs two recursive calls
+        \item<2-> \dots in \texttt{sum} it performs one r.c. and uses one
+            \texttt{acc} \dots
+        \item<3-> \dots we are going to use two intermediate values!
+
+        \item<4-> An implementation:
+            \begin{lstlisting}
+    fibHelper :: Int -> Int -> Int -> Int
+    fibHelper 0 val1    val2    = val1
+    fibHelper 1 val1    val2    = val2
+    fibHelper n val1    val2    =
+        fibHelper (n - 1) val2 (val1 + val2)
+
+    fib :: Int -> Int
+    fib n = fibHelper n 0 1
+            \end{lstlisting}
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Tail recursion and folds}
+
+    \begin{itemize}
+        \item We already saw folds - ``schemes" of recursive functions
+
+        \item We know that e.g. \texttt{sum} can be expressed as a fold:
+            \begin{lstlisting}
+    sum :: [Int] -> Int
+    sum xs = foldl (+) 0 xs
+            \end{lstlisting}
+            or
+            \begin{lstlisting}
+    sum' :: [Int] -> Int
+    sum' = foldr (+) 0
+            \end{lstlisting}
+
+        \item Is either of these tail-recursive? 
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Tail recursion and folds (cont.)}
+
+    \begin{itemize}
+        \item recall recursive steps of \texttt{foldr} and \texttt{foldl}:
+
+            \begin{lstlisting}
+    foldr f z (x:xs) = f x (foldr f z (x:xs))
+
+    ...
+
+    foldl f z (x:xs) = let z' = z `f` x 
+                       in foldl f z' xs
+            \end{lstlisting}
+
+        \item<2-> \texttt{foldr} is \emph{not} tail-recursive but \texttt{foldl} is
+            tail recursive!
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Algebraic Data Types}
+
+    \begin{itemize}
+        \item We define our own data types by stating data type name and it's
+            \emph{constructors} -- both identifiers types and constructors begin
+            with an uppercase letter
+
+        \item<2-> We already know \texttt{Bool}:
+            \begin{lstlisting}
+    data Bool = False | True
+            \end{lstlisting}
+
+            \texttt{Bool} is a type with two constructors: \texttt{True} and
+            \texttt{False}.
+
+        \item<3-> Similarly we can define e.g.:
+
+            \begin{lstlisting}
+    data Suits  = Spades 
+                | Hearts
+                | Diamonds
+                | Clubs
+            \end{lstlisting}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Algebraic Data Types (cont.)}
+
+    \begin{itemize}
+        \item<1-> We also saw tuples and a constructor \texttt{(,)} -- e.g.:\\
+            \begin{lstlisting}
+    (1, 'c') :: (Int, Char)
+            \end{lstlisting}
+
+        \item<2-> Constructors may contain \emph{fields} of certain type, e.g.:
+            \begin{lstlisting}
+    data MyPair = MyPair Int Char
+            \end{lstlisting}
+            Note that the name of a type  and a name of it's constructor can be
+            the same. A value of type \texttt{MyPair}:\\
+            \begin{lstlisting}
+    myPairVal :: MyPair
+    myPairVal = MyPair 1 'c' 
+            \end{lstlisting}
+
+        \item<3-> Values of algebraic data types are constructed in the same way
+            as values of lists and tuples.
+        
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Algebraic Data Types (cont.)}
+
+    \begin{itemize}
+        \item We can also pattern-match on data type values in function definitions and let-bindings
+            in the very same way as with lists and tuples:
+
+            \begin{lstlisting}
+    incMyPair :: MyPair -> MyPair
+    incMyPair (MyPair i c) = MyPair (i + 1) c
+            \end{lstlisting}
+
+        \item<2-> \dots but tuple type is more general -- \texttt{(a, b)} for any
+            types \texttt{a} and \texttt{b}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Algebraic Data Types (cont.)}
+
+    \begin{itemize}
+        \item Data types may be polymorphic in fields of constructors,
+            
+            \begin{lstlisting}
+    data Pair a b = Pair a b
+            \end{lstlisting}
+
+            we can specify type variables after the name of type and use them as
+            types of constructor fields.
+
+        \item<2-> And we can combine all of the above:
+            \begin{lstlisting}
+    data CrazyType a b c
+        = NoParamCtor
+        | MonoMorphicCtor1 Int 
+        | MonoCtor2 String [Char] Bool
+        | MonoCtor3 MyPair
+        | PolyCtor1 a b
+        | PolyCtor2 a Int
+        | PolyCtor3 (Pair c Int)
+        | PolyCtor4 (c -> a, Int)
+            \end{lstlisting}
+
+        \item We call these data types \emph{Algebraic Data Types} (ADT's)
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Some old ADT's \dots}
+
+    \begin{itemize}
+        \item<1-> The list type is just an ordinary type, the only special thing is
+            syntactic sugar for ``\texttt{[]}'' and ``\texttt{(:)}'':
+
+            \begin{lstlisting}
+    data List a = Nil | Cons a (List a)
+
+    length' :: List a -> Int
+    length' Nil         = 0
+    length' (Cons _ xs) = 1 + length' xs
+            \end{lstlisting}
+
+        \item<2-> And the same for tuples, as we already saw:
+
+            \begin{lstlisting}
+    data Pair a b = Pair a b
+
+    fst' :: Pair a b -> a
+    fst' (Pair x _) = x
+
+    snd' :: Pair a b -> b
+    snd' (Pair _ y) = y
+            \end{lstlisting}
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{\dots and some new}
+
+    \begin{itemize}
+        \item<1-> Sometimes, we need an extra value:
+        \begin{lstlisting}
+    data Maybe a = Nothing | Just a
+
+    safeHead :: [a] -> Maybe a
+    safeHead []     = Nothing
+    safeHead (x:_)  = Just x
+        \end{lstlisting}
+
+    \item<2-> ADT representing binary trees (values are only in leafs):
+
+        \begin{lstlisting}
+    data BinTree a
+        = Leaf a 
+        | Node (BinTree a) (BinTree a)
+
+    myTree :: BinTree Char
+    myTree = Node (Leaf 'a') (Leaf 'b')
+        \end{lstlisting}
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Type Classes}
+
+    \begin{itemize}
+        \item So far we saw monomorphic functions, e.g. \texttt{neg},
+            \texttt{and}, and polymorphic functions, e.g. \texttt{fst},
+            \texttt{head}.
+
+        \item<2-> What if we want a function, that is polymorphic only for some types
+            (ad-hoc polymorphism), e.g. \texttt{sort} for \texttt{Int},
+            \texttt{Integer}, and \texttt{Float}?
+            
+{\tt
+    ~\\
+~~~~sort :: \only<3->{Ord a =>} [a] -> [a] \\
+~~~~sort = ...\only<3->{~~\{- (<=) for a-values  -\}}\\
+    ~\\
+}
+
+            We need to constrain type variable $a$ to types, that can be
+            ordered. 
+
+        \item<4-> \texttt{Ord a} is a type class \emph{constraint}.
+
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Type Classes (cont.)}
+
+    \begin{itemize}
+        \item We can define a \emph{class} of types and specify which functions
+            (called class \emph{methods}) are
+            available for types of this class (i.e. type class behaves as an
+            interface), e.g.:
+
+            \begin{lstlisting}
+    class Ord a where
+        (<=) :: a -> a -> Bool
+            \end{lstlisting}
+
+        \item<2-> We can specify, that a type is and \emph{instance} of a class --
+            we provide an implementation of class functions for this type:
+
+           \begin{lstlisting}
+    instance Ord Int where
+        x <= y = primitiveIntComparison x y
+
+    instance Ord Float where
+        x <= y = primitiveFloatComparison x y
+           \end{lstlisting}
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Type Classes (cont.)}
+
+    \begin{itemize}
+        \item Instance definitions can itself be constrained and do recursively
+            compose. Recall our ADT \texttt{List}:
+
+           \begin{lstlisting}
+    instance Ord a => Ord (List a) where
+        Nil <= _    = True
+        (List x xs) <= (List y ys) =
+            if (x <= y) 
+                then if (x == y) 
+                    then xs <= ys
+                    else True
+                else False
+           \end{lstlisting}
+
+        \item<2-> And there is a similar instance for \texttt{[a]}
+        \item<3-> That means that if we provide instance \texttt{Ord OurData} we get 
+            \texttt{Ord [OurData]} for free.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Type Classes (cont.)}
+
+    \begin{itemize}
+        \item Some standard Haskell type classes:
+            \begin{itemize}
+                \item \texttt{Eq a} -- types with equality, \texttt{(==)}
+                \item \texttt{Ord a} -- ordered types, \texttt{(<), (<=)}
+                \item \texttt{Show a} -- types that can be pretty printed using
+                    \texttt{show}
+                \item \texttt{Num a} -- numeric types - \texttt{(+), (-), (*), abs,
+                    signum}
+
+                \item And many more \dots
+            \end{itemize}
+
+        \item<2-> Now we can fully understand type of e.g. \texttt{(+)}:
+
+            \begin{verbatim}
+GHCi, version 7.10.3: 
+Prelude> :t (+)
+
+(+) :: Num a => a -> a -> a
+            \end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Strong Static Typing}
+
+    \begin{itemize}
+        \item So far, we always provided a type of top-level definitions
+            (functions)
+
+        \item \dots we did not provide a type of functions in e.g. where blocks
+
+        \item<2-> Compiler \emph{infers} the \textbf{most generic} type of any 
+            expression automatically and in fact we do not need to provide even
+            types of top level definitions, e.g. for
+
+            \begin{alltt}
+    -- mySum :: ???
+    mySum = foldr (+) 0 xs
+            \end{alltt}
+            \vskip -1em
+            compiler infers the following type:
+
+            \begin{alltt}
+    GHCi, version 7.10.3:
+    Prelude> :t mySum
+    mySum :: (Num b, Foldable t) => t b -> b
+            \end{alltt}
+            \vskip -2em
+        \item<3-> \textbf{Best Practice:} Do provide top-level types -- types
+            document functions, and help compiler
+            produce simpler error messages 
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Next time}
+
+    \begin{itemize}
+        \item Monday the the 22th of February, 2-3PM,
+            Dalhousie 3G05 LT2
+        
+        \item More sorting algorithms
+            \begin{itemize}
+                \item Quick Sort
+                \item Merge Sort
+            \end{itemize}
+        \item IO in Haskell (Monads)
+
+    \end{itemize}
+
+\end{frame}
+
+
+\end{document}
+
+\begin{frame}[fragile]
+    \frametitle{Foo}
+
+    \begin{itemize}
+        \item
+    \end{itemize}
+\end{frame}
+

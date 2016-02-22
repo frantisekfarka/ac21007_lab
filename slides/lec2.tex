@@ -1,0 +1,483 @@
+\documentclass[final,handout]{beamer}
+\definecolor{green}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0,0, 0.6}
+%\setbeamertemplate{headline}[verdeuni]
+%\setbeamercovered{highly dinamic}
+%\usepackage{eso-pic}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usepackage{alltt}
+\usepackage{etex, xy}
+ \usepackage{tipa}
+
+\xyoption{all} %para los diagramas
+\usepackage{cancel}
+\usepackage{verbatim}
+%\usepackage{slashbox}
+\usetikzlibrary{decorations.pathreplacing,shapes.arrows}
+\newcommand\BackgroundPicture[1]{%
+  \setbeamertemplate{background}{%
+   \parbox[c][\paperheight]{\paperwidth}{%
+      \vfill \hfill
+\includegraphics[width=1\paperwidth,height=0.9\paperheight]{#1}
+        \hfill \vfill
+     }}}
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\newcommand{\rrdc}{\mbox{\,\(\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Right reduction
+\newcommand{\lrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\)\,}}% Left reduction
+\newcommand{\lrrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\hspace{-5pt}\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Equivalence
+\DeclareMathOperator{\id}{Id}
+\newcommand{\sCoq}{{\sc Coq}}
+\newcommand{\SSReflect}{{\sc SSReflect}}
+\newcommand{\Zset}{\mathbb{Z}}
+\newcommand{\Bset}{\mathbb{Z}_2}
+
+
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{Defn}{Definition}
+\newtheorem{Goal}{Goal}
+\newtheorem{GGoal}{General Goal}
+\newtheorem{Alg}{Algorithm}
+\newcommand{\inp}{{\itshape Input: }}
+\newcommand{\outp}{{\itshape Output: }}
+
+\renewcommand{\thefootnote}{$\ast$}
+\title[Haskell Lecture 2: List functions, function polymorphism]{AC21007: Haskell Lecture 2\\
+List functions, function polymorphism, non-strict semantics}
+\author[Franti\v{s}ek Farka]{Franti\v{s}ek Farka}
+\date{}
+\usetikzlibrary{arrows}
+
+\newcommand{\boxtt}[1]{\mbox{\scriptsize\texttt{#1}}}\newcommand{\cU}{\mathcal{U}}
+
+
+\begin{document}
+\BackgroundPicture{fondo1.png}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}
+    \frametitle{Recapitulation}
+
+    {\bf Haskell} 
+
+    \begin{itemize}
+    \item purely functional
+    
+    \item non-strict (also lazy) semantics
+
+    \item (strong) static typing
+    
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation (cont.)}
+
+    \begin{itemize}
+        \item 
+            Data types (\texttt{Bool, Int, String}, \dots) and
+            data values (\texttt{True, False,} \dots, -1, 0, 1, \dots, "Hello
+            World!", \dots ) \\
+            \uncover<2->{{\color{green}begin with an upper case letter}}%
+        \item Function and variable identifiers (power, neg, b, n) \\
+            \uncover<2->{{\color{green} begin with a lower case letter}}%
+        \item<3-> Variables in Haskell cannot be updated
+        \item<4-> Function definition:
+            \begin{itemize}
+                \item a set of equations, LHS is a pattern, RHS is an expression
+                \item value matches only itself (True matches True)
+                \item variable matches any value ... and binds the variable to
+                    the matched value
+            \end{itemize}
+  \end{itemize}
+
+\end{frame}  
+
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation (cont.)}
+
+    \begin{itemize}
+        \item An example: logic and
+            \begin{alltt}
+    myAnd :: Bool -> Bool -> Bool \pause
+    myAnd True  True   = True
+    myAnd True  False  = False
+    myAnd False True   = False
+    myAnd False False  = False
+            \end{alltt}
+\pause
+        \item Recall:
+            \begin{itemize}
+                \item value matches only itself (True matches True)
+                \item variable matches any value ... and binds the variable to
+                    the matched value
+            \end{itemize}
+  \end{itemize}
+
+\end{frame}  
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation (cont.)}
+
+    \begin{itemize}
+        \item An example: logic and
+            \begin{alltt}
+    myAnd :: Bool -> Bool -> Bool
+    myAnd True  True   = True
+    myAnd a     b      = False
+            \end{alltt}
+
+        \item Recall:
+            \begin{itemize}
+                \item value matches only itself (True matches True)
+                \item variable matches any value ... and binds the variable to
+                    the matched value
+            \end{itemize}
+  \end{itemize}
+
+\end{frame}  
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation (cont.)}
+
+    \begin{itemize}
+        \item An example: logic and
+            \begin{verbatim}
+    myAnd :: Bool -> Bool -> Bool
+    myAnd True  True   = True
+    myAnd _     _      = False
+            \end{verbatim}
+
+        \item Recall:
+            \begin{itemize}
+                \item value matches only itself (True matches True)
+                \item variable matches any value ... and binds the variable to
+                    the matched value
+            \end{itemize}
+        \item New:
+            \begin{itemize}
+                \item {\color{green} '\texttt{\_}' matches any value, no binding
+                    created}
+            \end{itemize}
+  \end{itemize}
+
+\end{frame}  
+
+
+
+\begin{frame}[fragile]
+    \frametitle{List Datatype}
+
+    \begin{itemize}
+        \item<1-> data type \texttt{[Int]} -- a list where each element is of
+            the type \texttt{Int}
+
+        \item<2-> list values created by \emph{constructors}
+            \begin{itemize}
+                \item \texttt{[]} -- constructs an empty list, and
+                \item \texttt{(:)} -- (\emph{cons}) from a value and list of values constructs
+                    a new list, prepends the value
+            \end{itemize}
+
+        \item<3-> These are lists:
+            \begin{alltt}
+        []
+        (1 : [])
+        (2 : (5 : (3 : [])))
+            \end{alltt}
+        \item<4-> There is a special syntax:
+            \begin{alltt}
+        [1]
+        [2, 5, 3]
+            \end{alltt}
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List Datatype (cont.)}
+
+    \begin{itemize}
+        \item<1-> data type \texttt{[Bool]} -- each element is of the type \texttt{Bool}
+        \item<2-> yet again, constructors \texttt{[]} and \texttt{(:)}
+        \item<3-> these are lists of booleans:
+            \begin{alltt}
+        []
+        True : (False : (True : []))
+        [False, True, True, False]
+            \end{alltt}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Programming with list datatypes}
+
+    \begin{itemize}
+        \item<1-> The \texttt{sum} function computes the sum of a list of integers:
+            \begin{alltt}
+    sum :: [Int] -> Int
+    sum []          = 0
+    sum (x : xs)    = x + (sum xs)
+            \end{alltt}
+
+        \item<3-> The \texttt{all} function determines whether all the elements of a list
+            of booleans are \texttt{True}:
+            \begin{alltt}
+    all :: [Bool] -> Bool
+    all []          = True
+    all (True : xs) = all xs
+    all _           = False
+            \end{alltt}
+
+        \item<2-> {\color{green} New patterns:} list values can be matched against list
+            constructors: \texttt{[]} matches itself and \texttt{(:)} matches
+            a non-empty list, while matching both the patterns for the first element and
+            for the rest of the list
+
+    \end{itemize}
+\end{frame}
+
+
+
+
+\begin{frame}[fragile]
+    \frametitle{Programming with list datatypes (cont.)}
+
+    \begin{itemize}
+        \item<1-> The \texttt{lengthInt} function computes the length of a list of integers:
+
+    \begin{alltt}
+    lengthInt :: [Int] -> Int
+    lengthInt []       = 0
+    lengthInt (_ : xs) = 1 + lengthInt xs
+    \end{alltt}
+
+        \item<2-> The \texttt{lengthBool} function computes the length of a list of integers:
+    \begin{alltt}
+    lengthBool :: [Bool] -> Int
+    lengthBool []       = 0
+    lengthBool (_ : xs) = 1 + lengthBool xs
+    \end{alltt}
+
+        \item<3-> The source code is nearly the same \dots \uncover<4->{can  we
+            abstract over Int and Bool?}
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List Datatype - \texttt{[a]}}
+
+    \begin{itemize}
+        \item<1-> Haskell has \emph{type variables} -- identifiers beginning
+            with a lowercase letter
+        \item<2-> Data type \texttt{[a]} -- a list where each element is of
+            type \texttt{a}
+        \item<3-> Exactly two constructors:
+            \begin{itemize}
+                \item \texttt{[] :: [a]}                   
+                \item \texttt{(:) :: a -> [a] -> [a]}                   
+            \end{itemize}
+        \item<4-> A type with type variables is \emph{polymorphic}, it is
+            instantiated to a \emph{monomorphic} type 
+        \item<5-> A polymorphic \texttt{length} function:
+            \begin{alltt}
+    length :: [a] -> Int
+    length []       = 0
+    length (_ : xs) = 1 + length xs
+            \end{alltt}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List Datatype \text{[a]} - some functions}
+
+    \begin{itemize}
+        \item<1-> \texttt{head} - access the first element:
+    \begin{alltt}
+    head :: [a] -> a 
+    
+    head (x : _) = x
+    \end{alltt}
+
+        \item<2-> \texttt{tail} - access the rest of a list:
+    \begin{alltt}
+    tail :: [a] -> [a]
+    
+    tail (_ : xs) = xs
+    \end{alltt}
+
+    \item<3-> What about a head of an empty list \texttt{head []}? \\
+        ~\\
+        \onslide<4->{\texttt{ \color{red}
+            Error: Non-exhaustive patterns in function head}}
+
+    \end{itemize}
+
+    %picture - LYAH?
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List Datatype \text{[a]} - some functions}
+
+    \begin{itemize}
+        \item \texttt{head} - access the first element:
+    \begin{alltt}
+    head :: [a] -> a 
+    head []      = ???
+    head (x : _) = x
+    \end{alltt}
+
+        \item \texttt{tail} - access the rest of a list:
+    \begin{alltt}
+    tail :: [a] -> [a]
+    tail []       = ???
+    tail (_ : xs) = xs
+    \end{alltt}
+
+    \item What is the RHS? We don't know anything about the type \texttt{a}.
+
+    \end{itemize}
+
+    %picture - LYAH?
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{List Datatype \text{[a]} - some functions}
+
+    \begin{itemize}
+        \item \texttt{head} - access the first element:
+    \begin{alltt}
+    head :: [a] -> a 
+    head []      = error "Empty list"
+    head (x : _) = x
+    \end{alltt}
+
+        \item \texttt{tail} - access the rest of a list:
+    \begin{alltt}
+    tail :: [a] -> [a]
+    tail []       = error "Empty list" 
+    tail (_ : xs) = xs
+    \end{alltt}
+
+    \item Haskell has special functions for run-time errors:
+
+        \begin{itemize}
+            \item \texttt{error :: String -> a} \\prints a specified error and
+                terminates evaluation (program)
+            \item \texttt{undefined :: a} \\ print a generic error and terminates
+                evaluation
+        \end{itemize}
+
+    \end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+    \frametitle{Syntactic intermezzo -- functions and operators}
+
+    \begin{itemize}
+        \item Sometimes we do not want functions (e.g. \texttt{power},
+            \texttt{sum}) but operators (e.g. \texttt{*}, \texttt{++})
+
+        \item<2-> Consider the following list index function:
+
+    \begin{alltt}
+    at :: [a] -> Int -> a
+    at (x : _)      0    = x
+    at (_ : xs)     1    = at (i - 1) xs
+    at []           _    = error "out of bound"
+
+        -- usage:   at [1,2,3] 1     ==> 2
+    \end{alltt}
+
+    \vspace {-1em}
+        \item<3-> We can use an operator:
+
+    \begin{alltt}
+    (!!) :: [a] -> Int -> a
+    xs !! i = at xs i
+
+        -- usage:   [1,2,3] !! 1    ==> 2
+    \end{alltt}
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Syntactic intermezzo -- functions and operators (cont.)}
+
+    \begin{itemize}
+        \item<1-> Function identifiers
+            \begin{itemize}
+                \item consist of a lowercase letter followed by zero or more
+                    letters, digits, underscores, and single quotes
+                \item prefix application (e.g. {\color{blue} \texttt{at [1,2,3]
+                    0}})
+            \end{itemize}
+        \item<2-> Operators
+            \begin{itemize}
+                \item consist of symbols -- 
+                    \texttt{\%!\#\$\%\&*+./<=>?\@\^{}|-\~{}}
+                        
+                    \item infix application (e.g. {\color{blue} \texttt{[1,2,3]
+                        !! 0}})
+            \end{itemize}
+        \item<3-> Special syntax for using an operator in the prefix notation
+            \begin{alltt}
+        (!!) [1,2,3] 2
+            \end{alltt}
+
+        \item<4-> Special syntax for using a function in the infix notation
+            \begin{alltt}
+        [1,2,3] `at` 2
+            \end{alltt}
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Next time}
+
+    \begin{itemize}
+        \item Monday the the 25th of January, 2-3PM,
+            Dalhousie 3G05 LT2
+
+        \item Non-strict semantics
+        \item More list functions
+        \item Tuples
+        \item First-class functions
+        \item Folds over lists
+    \end{itemize}
+
+\end{frame}
+
+
+
+
+\end{document}
+

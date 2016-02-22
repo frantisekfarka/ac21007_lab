@@ -1,0 +1,542 @@
+\documentclass[final,handout]{beamer}
+%\documentclass[]{beamer}
+\definecolor{green}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0,0, 0.6}
+\definecolor{red}{rgb}{0.6,0, 0}
+\definecolor{gray}{rgb}{0.6,0.6, 0.6}
+%\setbeamertemplate{headline}[verdeuni]
+%\setbeamercovered{highly dinamic}
+%\usepackage{eso-pic}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usepackage{alltt}
+\usepackage{etex, xy}
+\usepackage{tipa}
+
+\xyoption{all} %para los diagramas
+\usepackage{cancel}
+\usepackage{verbatim}
+%\usepackage{slashbox}
+\usetikzlibrary{decorations.pathreplacing,shapes.arrows}
+\newcommand\BackgroundPicture[1]{%
+  \setbeamertemplate{background}{%
+   \parbox[c][\paperheight]{\paperwidth}{%
+      \vfill \hfill
+\includegraphics[width=1\paperwidth,height=0.9\paperheight]{#1}
+        \hfill \vfill
+     }}}
+
+\usepackage{color}
+\usepackage{listings}
+\lstset{
+    language=haskell
+}
+
+
+\newcommand{\rrdc}{\mbox{\,\(\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Right reduction
+\newcommand{\lrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\)\,}}% Left reduction
+\newcommand{\lrrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\hspace{-5pt}\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Equivalence
+\DeclareMathOperator{\id}{Id}
+\newcommand{\sCoq}{{\sc Coq}}
+\newcommand{\SSReflect}{{\sc SSReflect}}
+\newcommand{\Zset}{\mathbb{Z}}
+\newcommand{\Bset}{\mathbb{Z}_2}
+
+
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{Defn}{Definition}
+\newtheorem{Goal}{Goal}
+\newtheorem{GGoal}{General Goal}
+\newtheorem{Alg}{Algorithm}
+\newcommand{\inp}{{\itshape Input: }}
+\newcommand{\outp}{{\itshape Output: }}
+
+\renewcommand{\thefootnote}{$\ast$}
+\title[Haskell Lecture 7]{AC21007: Haskell Lecture 7\\
+    Quick Sort,
+    %Merge Sort,
+    Monadic IO
+}
+\author[Franti\v{s}ek Farka]{Franti\v{s}ek Farka}
+\date{}
+\usetikzlibrary{arrows}
+
+\newcommand{\boxtt}[1]{\mbox{\scriptsize\texttt{#1}}}\newcommand{\cU}{\mathcal{U}}
+
+
+\begin{document}
+\BackgroundPicture{fondo1.png}
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulation}
+
+    \begin{itemize}
+        \item Tail recursion
+            \begin{itemize}
+                \item Sum
+                \item Fibonacci numbers
+                \item Tail recursion and folds
+            \end{itemize}
+        \item Algebraic data types
+        \item (Light introduction to) Typeclasses
+  \end{itemize}
+\end{frame}  
+
+
+\begin{frame}[fragile]
+    \frametitle{Quick Sort: Intuition}
+
+    \begin{enumerate}
+        \item Choose an element in a list as ``pivot''
+        \item Move all the elements larger than pivot to its right.
+        \item Move all the elements smaller than pivot to its left.
+        \item Recursively sort elements on left and on right of the pivot
+    \end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Quick Sort in Haskell}
+
+    \begin{itemize}
+        \item Quick Sort has two nice aspects:
+            \begin{itemize}
+                \item Divide and Conquer
+                \item In-place sort
+            \end{itemize}
+        \item<2-> In-place sort like quick sort requires mutable arrays and
+             mutable variables.
+        \item<3-> To get pure version of quick sort, we need to forget about
+                swapping, indexing, mutation.
+        \item<4-> Think in terms of creating new list based on input list.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Quick Sort in Haskell (cont.)}
+
+    \begin{itemize}
+        \item How to pick a pivot? \pause Take the first element.
+        \item<3-> Sort a list:
+
+            \begin{verbatim}
+quickSort [] = []
+quickSort (x:xs) =
+        let (left, right) = partition xs x
+        in quickSort left ++ [x] ++ quickSort right
+    where
+        partition []     _  = ([], [])
+        partition (y:ys) z  =
+            let (vs, ws) = partition ys
+            in if (y < z) 
+                    then (y:vs, ws)
+                    else (vs, y:ws)
+            \end{verbatim}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Quick Sort in Haskell (cont.)}
+
+    \begin{itemize}
+        \item Quick Sort has two nice aspects:
+            \begin{itemize}
+                \item Divide and Conquer
+                \item In-place sort
+            \end{itemize}
+        \item Our version only demonstrate the divide and conquer part.
+        \item Worst case time complexity: $\mathcal{O}(n^2)$
+        \item Average time complexity: $\mathcal{O}(n \log n)$
+    \end{itemize}
+\end{frame}
+
+
+
+
+%\begin{frame}[fragile]
+%    \frametitle{Merge Sort}
+%
+%    \begin{itemize}
+%        \item unfold - fold?
+%    \end{itemize}
+%
+%\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Syntactic Intermezzo: case expression}
+
+    \begin{itemize}
+        \item We saw ADTs
+        \item How do we inspect values of ADTs?
+            \begin{itemize}
+                \item Pattern matching in function definition
+                \item \texttt{case} expression
+            \end{itemize}
+        \item<2-> Syntax of \texttt{case} expression:
+
+\begin{alltt}
+    case <expr> of
+        <pat\(\sb{1}\)>      ->  <expr\(\sb{1}\)>
+        \dots
+        <pat\(\sb{n}\)>      ->  <expr\(\sb{n}\)>
+\end{alltt}
+        $<expr_1>$ to $<expr_n>$ are of some type $a$, the \texttt{case}
+        expression has a value of the type $a$, e.g.:
+  
+\begin{verbatim}
+    case (safeHead someList) of
+        Nothing -> "No head"
+        Just h  -> "The head is: " ++ show h
+\end{verbatim}
+    
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Maybe as a monadic computation}
+    
+    \begin{itemize}
+        \item We saw the \texttt{Maybe} data type
+        \item We saw that we can use it to enrich a range of a function (e.~g. to
+            make a partial function total):
+\pause
+    \begin{verbatim}
+        head :: [a] -> a
+        head []     = error "Empty list"
+        head (x:_)  = x
+    \end{verbatim}
+
+    vs.
+
+    \begin{verbatim}
+        safeHead :: [a] -> Maybe a
+        safeHead []     = Nothing
+        safeHead (x:_)  = Just x
+    \end{verbatim}
+
+        \item<3-> We will call \texttt{Maybe} is such a situation a \emph{context}
+            of a computation 
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Maybe as a monadic computation (cont.)}
+    
+    \begin{itemize}
+        \item Lets see how composable this approach is:
+    \begin{verbatim}
+    sqrtHead :: [Float] -> Float
+    sqrtHead xs = sqrt (head xs)
+    \end{verbatim}
+    \begin{itemize}
+        \item \texttt{head} fails on an empty list
+        \item \texttt{sqrt} fails on a negative number
+    \end{itemize}
+    
+        \item<2-> We already have \texttt{safeHead}, can we provide \texttt{safeSqrt}?
+
+    \begin{verbatim}
+    safeSqrt :: Float -> Maybe Float
+    safeSqrt a = if a < 0 
+                    then Nothing
+                    else Just (sqrt a)
+    \end{verbatim}
+
+        \item<3-> Let's compose these two into \texttt{safeSqrtHead} \dots
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Maybe as a monadic computation (cont.)}
+    
+    \begin{itemize}
+        \item Lets see how composable this approach is:
+    \begin{verbatim}
+    sqrtHead :: [Float] -> Float
+    sqrtHead xs = sqrt (head xs)
+
+    safeSqrtHead :: [Float] -> Maybe Float
+    safeSqrtHead xs = case safeHead xs of
+        Nothing     -> Nothing
+        Just x      -> safeSqrt x
+    \end{verbatim}
+
+    
+    ~\only<2->{\dots the explicit \texttt{case} is verbose}
+
+        \item Note the type signatures:
+
+    \begin{verbatim}
+    safeHead :: [a] -> Maybe a
+    safeSqrt :: Float -> Maybe Float
+    \end{verbatim}
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Maybe as a monadic computation (cont.)}
+    
+    \begin{itemize}
+        \item Lets see how composable this approach is:
+    {\tt \\~\\
+    safeSqrtHead :: [Float] -> Maybe Float\\
+    safeSqrtHead xs = safeHead xs `bind` safeSqrt\\
+    ~\\
+    \only<1-2>{bind :: Maybe Float -> (Float -> Maybe Float)\\ 
+    ~~~~-> Maybe Float}
+    \only<3->{~\\bind :: Maybe a -> (a -> Maybe b) -> Maybe b}\\
+    bind mval func   = case mval of\\
+    ~~~~~~~~Nothing~~~~~-> Nothing\\
+    ~~~~~~~~Just val~~~~-> func val\\
+    ~\\
+    }
+    ~\only<2->{\dots What is the most generic type of \texttt{bind}?}
+
+        \item Note the type signatures:
+
+    \begin{verbatim}
+    safeHead :: [a] -> Maybe a
+    safeSqrt :: Float -> Maybe Float
+    \end{verbatim}
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{\texttt{Monad} typeclass}
+    
+    \begin{itemize}
+        \item We can abstract this technique over different data types using
+            a typeclass (think of data types being ``bindable'' in the same way
+            as being ``orderable'' and \texttt{Ord} typeclass)
+        \item<2-> The \texttt{Monad} t.c. as an interface for binding computations:
+{\small
+    \begin{verbatim}
+class Monad m where
+    -- an operator instead of our `bind`
+    (>>=) :: m a -> (a -> m b) -> m b
+    return :: a -> m a
+
+instance Monad Maybe where
+    Nothing     >>= _   = Nothing
+    (Just a)    >>= f   = f a
+    return a            = Just a
+    \end{verbatim}
+}
+        The \texttt{return} fnct to embed a pure value
+        into a context
+
+        \item<3-> And our previous use case:
+{\small
+\begin{verbatim}
+    safeSqrtHead xs = safeHead xs >>= safeSqrt 
+    sqrtOfTwo = return 2 >>= safeSqrt
+\end{verbatim}
+}
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Unit Data type - ()}
+
+    \begin{itemize}
+        \item In Haskell all functions return a value
+        \item Sometimes, we are not interested in the actual  value
+        \item There is a data type for this --- \texttt{()} (unit) --- that has
+            a single constructor---also \texttt{()}.
+    \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]
+    \frametitle{Monadic IO}
+
+    \begin{itemize}
+        \item In Haskell all IO happens in a context of type \texttt{IO a}
+        \item \texttt{IO} encapsulates a state of the real world, you cannot
+            construct or inspect values of this type directly
+
+        \item<2-> There are functions that take or return \texttt{IO} values:
+
+            \begin{itemize}
+                \item \texttt{putStr, putStrLn :: String -> IO ()}
+                \item \texttt{getLine :: IO String}
+            \end{itemize}
+
+        \item<3-> And there is a \texttt{Monad IO} instance---\texttt{IO} computation can be
+            sequenced using bind ($>>=$), a pure value can be injected into an
+            \texttt{IO} context using \texttt{return}:
+
+        \begin{verbatim}
+helloYou =  getLine >>= \x -> 
+            putStrLn ("Hello " ++ x)
+        \end{verbatim}
+
+        \item<4-> We also say that there is an \emph{effect}, which is performed in
+            a monadic context (in general, not only \texttt{IO}).
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Do Notation}
+
+    \begin{itemize}
+        \item There is a syntax for monadic computations --- \texttt{do}
+            notation
+        \item<2-> We call a single call to a function that returns monadic value an
+            \emph{action}. We either bind a value \textbf{in} this context to a
+            variable:
+            \begin{alltt}
+    var\(\sb{n}\) <- action\(\sb{n}\)
+            \end{alltt}
+            \vskip -1em
+\pause
+            or we ignore this value (we are interested only in the effect)
+            \begin{alltt}
+    action\(\sb{n}\)
+            \end{alltt}
+            \vskip -1em
+\pause
+            and we sequence such actions in a block, while using bound
+            variables as arguments of other actions (following the action that
+            binds the variable):
+ 
+            \begin{alltt}
+    do
+        var\(\sb{1}\) <- action\(\sb{1}\)
+        var\(\sb{2}\) <- action\(\sb{2}\) 
+        \dots
+        action\(\sb{n}\) var\(\sb{i}\) var\(\sb{j}\)
+            \end{alltt}
+            \vskip -1em
+\pause
+        the result of a \texttt{do} block is the result of last action (this
+        action must not be a binding of a variable)
+
+
+            
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{IO -- A Simple Example}
+
+    \begin{itemize}
+        \item A simple example of IO:
+            \begin{lstlisting}
+-- | Prompts a user for a number
+getNumber :: String -> IO Int
+getNumber username = do
+        putStrLn ("Hello " ++ username ++ "!" 
+          ++ "Choose your favourite number:")
+        x <- getLine
+        putStrLn "Thank you!"
+        return (read x)
+            \end{lstlisting}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{An overview of IO functions}
+\small
+    \begin{itemize}
+        \item[putChar] \texttt{:: Char -> IO ()} \\
+            Write a character to the standard output device
+        \item[putStr] \texttt{:: String -> IO ()} \\
+            Write a string to the standard output device
+        \item[putStrLn] \texttt{:: String -> IO ()} \\
+            The same as putStr, but adds a newline character.
+        \item[getChar] \texttt{:: IO Char} \\
+            Read a character from the standard input device
+        \item[getLine] \texttt{:: IO String} \\
+            Read a line from the standard input device 
+        \item[type] \texttt{FilePath = String}
+        \item[readFile]\texttt{:: FilePath -> IO String} \\
+            Returns the contents of the file as a string.
+
+        \item[writeFile] \texttt{:: FilePath -> String -> IO ()} \\
+            Writes a string to a file.
+
+        \item[getArgs] \texttt{:: IO [String]}
+            Returns a list of the program's command line arguments
+            (in \texttt{System.Environment})
+    \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{IO -- A More Complex Example}
+
+    \begin{itemize}
+        \item Read file name from the input, sort it, write it to the output
+\small
+\begin{lstlisting}
+import System.Environment (getArgs)
+
+main = do
+    args <- getArgs
+    if null args
+        then print "Provide a filename"
+        else do
+            fileCnt <- readFile (head args)
+            let cnt :: [Int]
+                cnt = map read (lines fileCnt)
+            putStrLn (show (quickSort cnt))
+            writeFile
+                (mkName (head args)) 
+                ("#sorted: " ++ show (length cnt))
+    where
+        mkName name = takeWhile (/= '.') name
+            ++ ".out"
+\end{lstlisting}
+    
+        \item For more detailed description of functions use \emph{Hoogle}
+
+
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Last lecture}
+
+    \begin{itemize}
+        \item This was the last lecture
+        
+        \item Thank you for you patience
+
+        \item Please send me a feedback or any comments to
+            \url{frantisek@farka.eu}
+
+    \end{itemize}
+
+\end{frame}
+
+
+\end{document}
+
+\begin{frame}[fragile]
+    \frametitle{Foo}
+
+    \begin{itemize}
+        \item
+    \end{itemize}
+\end{frame}
+

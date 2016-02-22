@@ -1,0 +1,491 @@
+\documentclass[pdftex,landscape,final,handout,british]{beamer}
+%\definecolor{verdeuni}{rgb}{0.7,0.73437,0.55856}
+%\setbeamertemplate{headline}[verdeuni]
+%\setbeamercovered{highly dinamic}
+%\usepackage{eso-pic}
+
+\definecolor{red}{rgb}{0.7,0.0,0.0}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{color}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+\usepackage{alltt}
+\usepackage{etex, xy}
+\usepackage{tipa}
+
+\xyoption{all} %para los diagramas
+\usepackage{cancel}
+\usepackage{verbatim}
+%\usepackage{slashbox}
+\usetikzlibrary{decorations.pathreplacing,shapes.arrows}
+\newcommand\BackgroundPicture[1]{%
+  \setbeamertemplate{background}{%
+   \parbox[c][\paperheight]{\paperwidth}{%
+      \vfill \hfill
+\includegraphics[width=1\paperwidth,height=0.9\paperheight]{#1}
+        \hfill \vfill
+     }}}
+
+\usepackage{color}
+\usepackage{listings}
+
+
+\newcommand{\rrdc}{\mbox{\,\(\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Right reduction
+\newcommand{\lrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\)\,}}% Left reduction
+\newcommand{\lrrdc}{\mbox{\,\(\Leftarrow\hspace{-9pt}\Leftarrow\hspace{-5pt}\Rightarrow\hspace{-9pt}\Rightarrow\)\,}} % Equivalence
+\DeclareMathOperator{\id}{Id}
+\newcommand{\sCoq}{{\sc Coq}}
+\newcommand{\SSReflect}{{\sc SSReflect}}
+\newcommand{\Zset}{\mathbb{Z}}
+\newcommand{\Bset}{\mathbb{Z}_2}
+
+
+\newtheorem{Thm}{Theorem}
+\newtheorem{Prop}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{Defn}{Definition}
+\newtheorem{Goal}{Goal}
+\newtheorem{GGoal}{General Goal}
+\newtheorem{Alg}{Algorithm}
+\newcommand{\inp}{{\itshape Input: }}
+\newcommand{\outp}{{\itshape Output: }}
+
+\renewcommand{\thefootnote}{$\ast$}
+\title[Haskell Lecture 1: An Introduction to Haskell]{AC21007: Haskell Lecture 1\\
+An Introduction to Haskell}
+\author[Franti\v{s}ek Farka]{Franti\v{s}ek Farka}
+\date{}
+\usetikzlibrary{arrows}
+
+\newcommand{\boxtt}[1]{\mbox{\scriptsize\texttt{#1}}}\newcommand{\cU}{\mathcal{U}}
+
+
+\begin{document}
+\BackgroundPicture{fondo1.png}
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\BackgroundPicture{fondo.png}
+\begin{frame}
+    \frametitle{Syllabus of this part of the AC21007 module}
+
+    Lectures
+    \begin{itemize}
+        \item Lecture 1: An introduction to Haskell
+        \item Lecture 2: List functions, function polymorphism
+        \item Lecture 3: Folds, tail recursion
+        \item Lecture 4: Data types
+        \item Lecture 5: Type classes
+        \item Lecture 6: Sorting algorithms in Haskell
+        \item Lecture 7: AI Algorithms: BFS, DFS, ...
+        \item Lecture 8: tbd
+    \end{itemize}
+
+    Labs 
+    \begin{itemize}
+        \item each week, half a slot
+        \item please use the Lab 2
+        \item weekly lab exercises, a final assignment
+    \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Resources}
+ 
+    \begin{itemize}
+
+    \item Books:
+
+        \beamertemplatebookbibitems
+        \begin{thebibliography}{99}
+            \bibitem{haskell}{Thompson, Simon. Haskell: The craft of functional programming(3rd Edition)\\ 
+            }
+            \bibitem{haskell}{Mena, Alejandro Serrano.                   
+                    Beginning Haskell: A Project-Based Approach\\
+            }
+        \end{thebibliography}
+
+    \item Free online resources:
+        \begin{thebibliography}{99}
+
+            \bibitem{lyah}{Learn You a Haskell for Great Good!\\ 
+                \url{http://learnyouahaskell.com/}
+            }
+            \bibitem{rwh}{
+                    Real World Haskell\\ 
+                \url{http://book.realworldhaskell.org/}
+            }
+        \end{thebibliography}
+    \end{itemize}
+
+    
+    \end{frame}
+
+
+    \begin{frame}
+    \frametitle{History of Haskell}
+
+    \begin{itemize}
+    \item Named after the logician Haskell Curry
+    \item Conference on Functional Programming Languages and Computer Architecture in Portland, Oregon. 1987
+    \item Common language for \textit{lazy functional programming languages} research
+    \item Matured a lot over the past 29 years
+    \item Several standards: Haskell98, Haskell2010
+    \end{itemize}
+
+    \pause
+
+    \begin{itemize}
+        \item De facto implementation: Glasgow Haskell Compiler
+            (GHC)\footnote{Current: The Glorious Glasgow Haskell
+                Compilation System, version 7.10.2}
+    \item New development of the language via GHC language extensions
+    \end{itemize}
+
+    \end{frame}
+
+    \begin{frame}
+    \frametitle{Notable Features of Haskell}
+
+    {\bf Haskell} \textipa{/"h{\ae}sk@l/} is a standardised, general-purpose purely functional
+    programming language, with non-strict semantics and strong static
+    typing.\footnote{\url{https://en.wikipedia.org/wiki/Haskell_(programming_language)}}
+
+
+    \begin{itemize}
+    \item<2-> purely functional
+    
+    \item<3-> non-strict (also lazy) semantics
+
+    \item<4-> (strong) static typing
+    
+    \end{itemize}
+
+    \end{frame}
+
+
+    \begin{frame}
+    \frametitle{Programming Language Paradigms}
+    
+    \begin{itemize}
+    \item<1-> Procedural languages: Pascal, C, Python, ...
+    \item<2-> Object Oriented languages: C++, Java, C\#, Python... 
+    \item<3-> Functional languages: Haskell, ML, OCaml, Lisp,...
+    \item<4-> Functional and Object Oriented languages: Scala,...  
+    \item<5-> Declarative-Logic languages: Prolog, ...
+    \item<6-> and many others: Erlang, Go,...
+    \end{itemize}
+
+    \end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Imperative Style: C}
+    Power function: %$b^0 = 1$, $b^{n} = b*b^{n-1}$ if $n>0$.
+    $ b^n = \begin{cases} 
+        1 & n =  0 \\
+        b * b ^ {n-1} & n > 0
+        \end{cases}
+    $
+
+    \pause
+
+    \vskip 1em
+    An implementation in C:
+
+    \begin{verbatim}
+int power(int b, int n)
+{
+    int p = 1;
+
+    for ( ; 0 < n; --n)
+       p = p * b;
+    return p;
+}
+\end{verbatim}
+
+    \pause
+    {\tt power(7,3) $==>$ 343}
+ 
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Imperative Style: C}
+    %Power function: %$b^0 = 1$, $b^{n} = b*b^{n-1}$ if $n>0$.
+    %$ b^n = \begin{cases} 
+    %    1 & n =  0 \\
+    %    b * b ^ {n-1} & n > 0
+    %    \end{cases}
+    %$
+
+    %\vskip 1em
+    A bit more verbose implementation in C:
+
+    \pause
+
+    \begin{verbatim}
+int power(b, n)
+    int b;
+    int n;
+{
+    int p;
+    p = 1;
+
+forcycle:
+    if (! (0 < n )) goto endfor; 
+        p = p * b;
+        --n;
+    goto forcycle;
+endfor:
+
+    return p;
+}
+\end{verbatim}
+ 
+\end{frame}
+
+
+\begin{frame}[fragile]
+ \frametitle{Functional Style: Haskell}
+    Power function: %$b^0 = 1$, $b^{n} = b*b^{n-1}$ if $n>0$.
+    $ b^n = \begin{cases} 
+        1 & n =  0 \\
+        b * b ^ {n-1} & n > 0
+        \end{cases}
+    $
+
+    \pause
+    \vskip 1em
+
+A Haskell implementation:
+
+\begin{verbatim}
+power :: Int -> Int -> Int
+power b 0 = 1
+power b n = b * (power b (n - 1))
+\end{verbatim}
+
+\pause
+    {\tt \small
+        power 7 3 \\ 
+        \pause $==>$ 7 * (power 7 (3 - 1)) \\
+        \pause $==>$ 7 * (power 7 2) \\ 
+        \pause $==>$ 7 * (7 * (power 7 (2 - 1))) \\ 
+        \pause $==>$ 7 * (7 * (power 7 1)) \\ 
+        \pause $==>$ 7 * (7 * (7 * (power 7 (1 - 1)))) \\
+        \pause $==>$ 7 * (7 * (7 * (power 7 0))) \\
+        \pause $==>$ 7 * (7 * (7 * (1)) \\
+        \pause $==>$ 7 * (7 * (7)) \\ 
+        \pause $==>$ 7 * (49) \\
+        \pause $==>$ 343
+    }
+
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Functional Style: Haskell (cont.)}
+    Logical negation: %$b^0 = 1$, $b^{n} = b*b^{n-1}$ if $n>0$.
+    $ \neg p = \begin{cases} 
+        False & p =  True \\
+        True  & p = False
+        \end{cases}
+    $
+
+    \vskip 1em
+
+A Haskell implementation:
+
+\begin{alltt}
+not :: Bool -> Bool
+not True  = False
+not False = True
+\end{alltt}
+
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Purity}
+\begin{verbatim}  
+int counter = 0;
+int power(int b, int n)
+{
+    if (counter > 5) return 42;
+    counter++;
+
+    int p = 1;
+    for (; 0 < n; --n)
+       p = p * b;
+    return p;
+}  
+\end{verbatim}  
+
+\pause
+
+\begin{alltt}
+power :: Int -> Int -> Int
+power b 0 = 1
+power b n = b * (power b (n-1))
+\end{alltt}
+
+\pause
+
+\begin{itemize}
+    \item Both power functions have similar type
+    \item However, Haskell's power function is \emph{pure} - has no side effects
+\end{itemize}
+\end{frame}  
+
+
+
+\begin{frame}
+    \frametitle{Summary}
+
+  Imperative Style:
+  \begin{itemize}
+    \item Close to machine   
+    \item Programming by iteration and by modifications of state (for-loops, updates of variables)
+    \item Side-effects
+  \end{itemize}
+
+  Functional Style:
+  \begin{itemize}
+    \item Close to problem description
+    \item Program by recursion (no for-loops, no updates of variables)
+    \item No side-effects
+
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Development environment}
+
+    \begin{itemize}
+        \item A text editor of your choice
+
+        \item Haskell Platform - \url{https://www.haskell.org/platform/}
+            \begin{itemize}
+                \item The Glasgow Haskell Compiler
+                \item The Cabal build system
+                \item 35 core \& widely-used packages (libraries)
+            \end{itemize}
+    \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+    \frametitle{Development environment (cont.)}
+
+    \begin{itemize}
+        \item A word about GHC
+            \begin{itemize}
+                \item a compiler {\tt ghc}
+                \item an interpreter {\tt ghci}
+                \item a limited set of standard packages ({\tt base}, \dots)
+            \end{itemize}
+
+        \item A word about Cabal
+            \begin{itemize}
+                \item a package manager {\tt cabal}
+                \item used both for installing new packages and project
+                    management
+                \item uses online repository Hackage
+            \end{itemize}
+
+        \item A word about Hackage (\url{https://hackage.haskell.org/})
+            \begin{itemize}
+                \item community's central package archive
+                \item contains generated documentation
+                \item search engine Hoogle
+                    (\url{https://www.haskell.org/hoogle/})
+            \end{itemize}
+
+
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Hello World!}
+
+    \begin{itemize}
+        \item Because every language tutorial has it, and
+        \item to show you few other basics.
+    \end{itemize}
+
+    \pause
+
+    a file \emph{Main.hs}:
+    \begin{verbatim}
+module Main where
+
+{-  Simple function to create a hello 
+    message. -}
+hello :: String -> String
+hello s = "\n\tHello " ++ s
+
+-- Entry point of a program
+main :: IO ()
+main = putStrLn (hello "World")
+    \end{verbatim}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Next time}
+
+    \begin{itemize}
+        \item one extra lecture, Wednesday the the 20th of January, 11-12AM,
+            { \color{red}{Wolfson LT, QMB} }
+
+        \item lists and list functions
+        \item non-strict (lazy) semantics
+        \item function polymorphism
+
+    \end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%% 
+% unused
+
+\begin{frame}
+  \frametitle{GHCi demo}
+  \url{http://www.tutorialspoint.com/compile_haskell_online.php}
+\end{frame}
+
+%\begin{frame}[fragile]
+%  \frametitle{Types and Purity}
+%\begin{verbatim}  
+%int power(int b, int n)
+%{
+%    int p = 1;
+%    for (; 0 < n; --n)
+%       p = p * b;
+%    erase-hard-drive();       
+%    return p;
+%}  
+%\end{verbatim}  
+%\begin{alltt}
+%power :: Int -> Int -> Int
+%power b 0 = 1
+%power b n = b * (power b (n-1))
+%\end{alltt}
+%
+%\begin{itemize}
+%\item Both power functions have similar type
+%\item However, Haskell's power function can't erase a hard-drive \dots
+%\end{itemize}
+%\end{frame}  
+
+\end{document}
