@@ -48,9 +48,9 @@ Lab Assignments
     - reconstructing data type from functions and instances
 
 * [Lab 6](lab06/README.md)
-    - putting al the pices together
+    - putting all the pieces together
     - a binary that
         - takes input and output file from command line
-        - promts for a sorting algorithm to use
+        - prompts for a sorting algorithm to use
         - sort the input file and writes it to the output file
     - no cabal package provided
