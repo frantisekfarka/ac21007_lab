@@ -7,8 +7,8 @@ The task in this lab is to write a Haskell package that provides a program
 * The program takes a name of an input file as it's first command-line argument.
 * The input file contains a list of numbers separated by a new line (see
   [file.in](./file.in) as an example of an input file).
-* The program promts user for a sorting algorithm to use. At least the following
-  sorting algoritms are available:
+* The program prompts user for a sorting algorithm to use. At least the following
+  sorting algorithms are available:
 
   * Insertion Sort
   * Selection Sort
@@ -20,7 +20,7 @@ The task in this lab is to write a Haskell package that provides a program
 
 
 Note that almost all the parts of such a program have already been introduced
-either in lecture slides or in previos labs. The only new part is cabal project
+either in lecture slides or in previous labs. The only new part is cabal project
 file specification of an executable. In fact, it is quite similar to a
 specification of a library:
 ```
@@ -35,10 +35,10 @@ specification of a library:
 
 ```
 
-The above code specifies that a Cabal package proveds an executable called
+The above code specifies that a Cabal package provides an executable called
 ``myProgram'', the main entry point of this program is in a file Main.hs, and
 all the source files are stored within the ``src'' directory. This executable
-also uses an additional module (source file): ``SortingAlgs.hs''. YOu can
+also uses an additional module (source file): ``SortingAlgs.hs''. You can
 generate such a package description using the "cabal init" utility, which you
 know from the last lab. The rest of the description of cabal package
 specification in that labs also applies.
@@ -47,10 +47,10 @@ specification in that labs also applies.
 Bonus task
 ----------
 
-As an additional taks, you may extend your package in such a way, that it
-provides a library of sorting algorithms beside the above binary. The abouve
-binary then provides only an interface to such a library and imports
-modules of this library.
+As an additional task, extend your package in such a way, that it provides a
+library of sorting algorithms beside the above binary. The above binary then
+serves only as an interface to such a library and imports modules of this
+library.
 
 
 
