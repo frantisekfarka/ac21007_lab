@@ -23,7 +23,8 @@ Note that almost all the parts of such a program have already been introduced
 either in lecture slides or in previous labs. The only new part is cabal project
 file specification of an executable. In fact, it is quite similar to a
 specification of a library:
-```
+
+```cabal
     ...
 
     executable myProgram
@@ -36,9 +37,9 @@ specification of a library:
 ```
 
 The above code specifies that a Cabal package provides an executable called
-``myProgram'', the main entry point of this program is in a file Main.hs, and
-all the source files are stored within the ``src'' directory. This executable
-also uses an additional module (source file): ``SortingAlgs.hs''. You can
+``myProgram``, the main entry point of this program is in a file Main.hs, and
+all the source files are stored within the ``src`` directory. This executable
+also uses an additional module (source file): ``SortingAlgs.hs``. You can
 generate such a package description using the "cabal init" utility, which you
 know from the last lab. The rest of the description of cabal package
 specification in that labs also applies.
